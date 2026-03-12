@@ -1,0 +1,90 @@
+header, main {
+    text-align: center;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+header button {
+    font-size: 1rem;
+    padding: 15px;
+    margin: 50px 0px 25px 0px;
+}
+
+/* Table */
+
+#game-table {
+    background-color: #ffffff;
+    margin: auto;
+    border: 1px solid #E7E7E7;
+    border-collapse: collapse;
+    box-shadow: 2px 5px 5px #cacaca;
+    table-layout: fixed;
+}
+
+#game-table th,
+#game-table td {
+    color: #181818;
+    white-space: nowrap;
+    padding: 10px 15px;
+    max-width: 300px;
+}
+
+#game-table th {
+    background-color: #E7E7E7;
+    font-weight: 500;
+}
+
+.game-img {
+    width: 120px;
+    height: 120px;
+}
+
+.game-score p {
+    font-weight: bold;
+    padding:10px;
+    border-radius: 5px;
+}
+
+.badScore {
+    color: #FFFFFF;
+    background-color: #FF0700;
+}
+
+.mehScore {
+    color: #FFFFFF;
+    background-color: #FF7200;
+}
+
+.okScore {
+    color: #FFFFFF;
+    background-color: #ffc400;
+}
+
+.goodScore {
+    color: #FFFFFF;
+    background-color: #00f100;
+}
+
+.greatScore {
+    color: #FFFFFF;
+    background-color: #00CBFF;
+}
+
+/* Modal */
+
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: block;
+}
+
+.modalBackground {
+    position: fixed;
+    z-index: 999999;
+    background-color: #00000080;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+}

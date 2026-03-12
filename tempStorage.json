@@ -1,0 +1,95 @@
+{
+    "games": [
+        {
+            "img": "https://http2.mlstatic.com/D_NQ_NP_925046-MLB73472830116_122023-O-jogo-megamind-the-blue-defender-nintendo-ds.webp",
+            "name": "TEST GAME",
+            "developer": "DEVELOPER",
+            "publisher": "PUBLISHER",
+            "platform": "PC",
+            "link": "https://google.com",
+            "started_at_date": "2026-03-11",
+            "started_at_time": "23:57",
+            "finished_at_date": "2026-03-22",
+            "finished_at_time": "23:57",
+            "score": 5.0
+        },
+        {
+            "img": "https://http2.mlstatic.com/D_NQ_NP_925046-MLB73472830116_122023-O-jogo-megamind-the-blue-defender-nintendo-ds.webp",
+            "name": "TEST GAME",
+            "developer": "DEVELOPER",
+            "publisher": "PUBLISHER",
+            "platform": "PC",
+            "link": "https://google.com",
+            "started_at_time": "23:57",
+            "finished_at_time": "23:57",
+            "score": 5.0
+        },
+        {
+            "img": "https://http2.mlstatic.com/D_NQ_NP_925046-MLB73472830116_122023-O-jogo-megamind-the-blue-defender-nintendo-ds.webp",
+            "name": "TEST GAME",
+            "developer": "DEVELOPER",
+            "publisher": "PUBLISHER",
+            "platform": "PC",
+            "link": "https://google.com",
+            "started_at_date": "2026-03-11",
+            "finished_at_date": "2026-03-22",
+            "score": 5.0
+        },
+        {
+            "img": "https://http2.mlstatic.com/D_NQ_NP_925046-MLB73472830116_122023-O-jogo-megamind-the-blue-defender-nintendo-ds.webp",
+            "name": "TEST GAME",
+            "developer": "DEVELOPER",
+            "publisher": "PUBLISHER",
+            "platform": "PC",
+            "link": "https://google.com",
+            "started_at_date": "2026-03-11",
+            "started_at_time": "23:57",
+            "finished_at_date": "2026-03-22",
+            "finished_at_time": "23:57",
+            "score": 0.0
+        },
+        {
+            "img": "https://http2.mlstatic.com/D_NQ_NP_925046-MLB73472830116_122023-O-jogo-megamind-the-blue-defender-nintendo-ds.webp",
+            "name": "TEST GAME",
+            "developer": "DEVELOPER",
+            "publisher": "PUBLISHER",
+            "platform": "PC",
+            "link": "https://google.com",
+            "started_at_date": "2026-03-11",
+            "started_at_time": "23:57",
+            "finished_at_date": "2026-03-22",
+            "finished_at_time": "23:57",
+            "score": 1.5
+        },
+        {
+            "img": "https://http2.mlstatic.com/D_NQ_NP_925046-MLB73472830116_122023-O-jogo-megamind-the-blue-defender-nintendo-ds.webp",
+            "name": "TEST GAME",
+            "developer": "DEVELOPER",
+            "publisher": "PUBLISHER",
+            "platform": "PC",
+            "link": "https://google.com",
+            "started_at_date": "2026-03-11",
+            "started_at_time": "23:57",
+            "finished_at_date": "2026-03-22",
+            "finished_at_time": "23:57",
+            "score": 3.0
+        },
+        {
+            "img": "https://http2.mlstatic.com/D_NQ_NP_925046-MLB73472830116_122023-O-jogo-megamind-the-blue-defender-nintendo-ds.webp",
+            "name": "TEST GAME",
+            "developer": "DEVELOPER",
+            "publisher": "PUBLISHER",
+            "platform": "PC",
+            "link": "https://google.com",
+            "started_at_date": "2026-03-11",
+            "started_at_time": "23:57",
+            "finished_at_date": "2026-03-22",
+            "finished_at_time": "23:57",
+            "score": 4.0
+        },
+        {
+            "name": "TEST GAME",
+            "platform": "PC"
+        }
+    ]
+}
