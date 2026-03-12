@@ -5,33 +5,100 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Game Backlog</title>
         <link rel="stylesheet" href="style.css">
+        <link rel="stylesheet" href="modal.css">
     </head>
     <body>
         <div id="modal" class="modalBackground hidden">
+            <div class="modalContainer" id="modal-container" onclick="event.stopPropagation()">
+                <div class="addEditModal">
+                    <h2 id="add-edit-header">--</h2>
+                    <form class="flexColumn" id="game-form" method="POST" enctype="multipart/form-data">
+                        <label class="formRequired" for="game-name">Game Name</label>
+                        <input id="game-name" name="gameName" type="text" required>
 
+                        <label class="formOptional" for="game-dev">Developer</label>
+                        <input id="game-dev" name="gameDev" type="text">
+
+                        <label class="formOptional" for="game-publisher">Publisher</label>
+                        <input id="game-publisher" name="gamePublisher" type="text">
+
+                        <label class="formRequired" for="game-platform">Platform</label>
+                        (placeholder :>)
+                        <!-- dropdown here -->
+
+                        <label class="formOptional" for="game-link">Link (URL)</label>
+                        <input id="game-link" type="text">
+
+                        <label class="formRequired">Status:</label>
+                        <div class="statusSelect">
+                            <input type="radio" name="gameStatus" id="status-not-played" value="NOTPLAYED" checked>
+                            <label for="status-not-played">Not Played</label>
+
+                            <input type="radio" name="gameStatus" id="status-playing" value="PLAYING">
+                            <label for="status-playing">Playing</label>
+
+                            <input type="radio" name="gameStatus" id="status-finished" value="FINISHED">
+                            <label for="status-finished">Finished</label>
+                        </div>
+
+                        <div id="started-at-info" class="DateTimeSelect hidden flexColumn">
+                            <h3>Started at</h3>
+                            
+                            <label class="formOptional" for="game-start-date">Date</label>
+                            <input type="date" id="game-start-date" name="gameStartDate" >
+                            
+                            <label class="formOptional" for="game-start-hour">Time</label>
+                            <div class="flexRow">
+                                <input type="number" id="game-start-hour" name="gameStartHour" min="00" max="23">
+                                :
+                                <input type="number" id="game-start-minute" name="gameStartMinute" min="00" max="59">
+                            </div>
+                        </div>
+
+                        <div id="finished-at-info" class="DateTimeSelect hidden flexColumn">
+                            <h3>Finished at</h3>
+                            
+                            <label class="formOptional" for="game-finish-date">Date</label>
+                            <input type="date" id="game-finish-date" name="gameFinishDate" pattern="\d{2}-\d{2}-\d{4} >
+                            
+                            <label class="formOptional" for="game-finish-hour">Time</label>
+                            <div class="flexRow">
+                                <input type="number" id="game-finish-hour" name="gameFinishHour" min="00" max="23">
+                                :
+                                <input type="number" id="game-finish-minute" name="gameFinishMinute" min="00" max="59">
+                            </div>
+                        </div>
+
+                        <footer class="formFooter">
+                            <button id="game-form-cancel" type="button">Cancel</button>
+                            <button id="game-form-save" type="submit">Save</button>
+                        </footer>
+                    </form> 
+                </div>
+            </div>
         </div>
         <header>
             <h1 class="topheader">Game Backlog</h1>
-            <button onclick="openModal()">Add Game</button>
+            <button id="add-game-btn">Add Game</button>
         </header>
         <main>
             <table id="game-table">
                 <tr align="center">
                     <th>Imagem</th>
                     <th>Nome</th>
-                    <th>Dev(s)</th>
+                    <th>Developer(s)</th>
                     <th>Publisher</th>
                     <th>Platform</th>
                     <th>Link</th>
                     <th>Started at</th>
                     <th>Finished at</th>
                     <th>Score</th>
-                    <!-- <th></th> -->
+                    <th></th>
                 </tr>
             </table>
         </main>
 
-        <script src="index.js"></script>
-        <script src="modal.js"></script>
+        <script type="module" src="index.js"></script>
+        <!-- <script src="modal.js"></script> -->
     </body>
 </html>

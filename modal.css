@@ -1,0 +1,109 @@
+.hidden {
+    display: none;
+}
+
+.visible {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flexColumn {
+    flex-direction: column;
+}
+
+.flexRow {
+    flex-direction: column;
+}
+
+/* Add Edit Game */
+
+#add-edit-header {
+    margin-bottom: 20px;
+}
+
+.formRequired:after {
+    color: red;
+    content: " *";
+}
+
+.formOptional:after {
+    color: rgb(151, 151, 151);
+    font-size: 0.8rem;
+    content: " (Optional)";
+}
+
+.modalBackground {
+    position: fixed;
+    z-index: 999999;
+    background-color: #000000ce;
+    width: 100vw;
+    height: 100vh;
+    top: 0;
+    left: 0;
+}
+
+.modalContainer {
+    background-color: #ffffff;
+    width: fit-content;
+    height: fit-content;
+    padding: 20px;
+    border: 1px solid #E7E7E7;
+    border-radius: 15px;
+    max-height: 600px;
+    overflow: scroll;
+}
+
+.modalContainer input {
+    font-size: 0.9rem;
+}
+
+.modalContainer p,
+.modalContainer label, 
+.modalContainer h1,
+.modalContainer h2,
+.modalContainer h3 {
+    user-select: none;
+    margin: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+.modalContainer form {
+    display: flex;
+}
+
+.modalContainer label {
+    margin: 15px 0px 5px 0px;
+}
+
+.statusSelect {
+    display: flex;
+    margin-bottom: 20px;
+    /* flex-direction: row; */
+}
+
+.statusSelect label {
+    margin: 0px 10px 0px 0px;
+}
+
+.DateTimeSelect {
+    /* display: flex; */
+    /* flex-direction: column; */
+    margin-top: 15px;
+    border: 1px solid #E7E7E7;
+    border-radius: 5px; 
+    padding: 15px;
+    align-items: center;
+}
+
+.DateTimeSelect label {
+    margin: 25px 0px 5px 0px;
+}
+
+.formFooter {
+    margin-top: 10px;
+}
+
+.formFooter button {
+    font-size: 1rem;
+}
