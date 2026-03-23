@@ -47,7 +47,6 @@ gameForm.addEventListener("submit", function(event) {
 
     let gameNameInput = document.getElementById("game-name");
     let gameDevInput = document.getElementById("game-dev");
-    let gamePublisherInput = document.getElementById("game-publisher");
     // let gamePlatformInput = document.getElementById("game-platform");
     let gameLinkInput = document.getElementById("game-link");
     // let gameStatusInput = document.getElementById("game-name");
@@ -61,7 +60,6 @@ gameForm.addEventListener("submit", function(event) {
 
     console.log(`Name: ${gameNameInput.value}`)
     console.log(`Developer: ${gameDevInput.value}`)
-    console.log(`Publisher: ${gamePublisherInput.value}`)
     console.log(`Platform: `)
     console.log(`Link: ${gameLinkInput.value}`)
     console.log(`Start Date: ${gameStartDateInput.value}`)

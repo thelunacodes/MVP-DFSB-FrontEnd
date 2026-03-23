@@ -2,183 +2,253 @@ import { openCreateEditModal } from "./modal.js";
 
 class Game {
     constructor(id,
-                image=undefined,
-                name,
+                imageUrl=undefined,
+                gameTitle,
                 developer=undefined,
-                publisher=undefined,
                 platform,
-                link=undefined,
-                startedAtDate=undefined,
-                startedAtTime,
-                finishedAtDate=undefined,
-                finishedAtTime,
+                gameUrl=undefined,
+                startDate=undefined,
+                startTime,
+                finishDate=undefined,
+                finishTime,
                 score=undefined,) {
         this.id = id;
-        this.image = image;
-        this.name = name;
+        this.imageUrl = imageUrl;
+        this.gameTitle = gameTitle;
         this.developer = developer;
-        this.publisher = publisher;
         this.platform = platform;
-        this.link = link;
-        this.startedAtDate = startedAtDate;
-        this.startedAtTime = startedAtTime;
-        this.finishedAtDate = finishedAtDate;
-        this.finishedAtTime = finishedAtTime;
+        this.gameUrl = gameUrl;
+        this.startDate = startDate;
+        this.startTime = startTime;
+        this.finishDate = finishDate;
+        this.finishTime = finishTime;
         this.score = score; 
     }
+}
+
+let gameList = [];
+
+function addToList(game) {
+    addGameToTable(game)
 }
 
 function parseJsonToGameInstance(data) {
     const gameInstance = new Game(data.id,
                                 data.img,
-                                data.name,
+                                data.gameTitle,
                                 data.developer,
-                                data.publisher,
                                 data.platform,
-                                data.link,
-                                data.started_at_date ? new Date(data.started_at_date) : null,
-                                data.started_at_time ? data.started_at_time : null,
-                                data.finished_at_date ? new Date(data.finished_at_date) : null,
-                                data.finished_at_time ? data.finished_at_time : null,
+                                data.gameUrl,
+                                data.startDate ? new Date(data.startDate) : null,
+                                data.startTime ? data.startTime : null,
+                                data.finishDate ? new Date(data.finishDate) : null,
+                                data.finishTime ? data.finishTime : null,
                                 data.score 
     );
 
     return gameInstance;
 }
 
-export async function loadGames() {
-    const response = await fetch("tempStorage.json");
-    const data = await response.json();
+async function getGameList() {
+    let url = 'http://127.0.0.1:5000/games';
+    fetch(url, {method: 'get',})
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+            
+            data.forEach(item => {
+                const newGame = parseJsonToGameInstance(item);
+                addToList(newGame);
+            })
+        })
+        .catch((error) => {
+            console.error(`Error: ${error}`)
+        })
+}
 
-    const gameList = data.games ?? [];
+getGameList(); 
 
-    gameList.map(parseJsonToGameInstance)
-            .forEach(addGameToTable);
+// Add game to database
+function addGameToDatabase(game) {
+    const formData = new FormData();
+    formData.append('imageUrl', game.imageUrl);
+    formData.append('gameTitle', game.gameTitle);
+    formData.append('developer', game.developer);
+    formData.append('platform', game.platform);
+    formData.append('gameUrl', game.gameUrl);
+    formData.append('startDate', game.startDate?.toISOString() ?? "");
+    formData.append('startTime', game.startTime);
+    formData.append('finishDate', game.finishDate?.toISOString() ?? "");
+    formData.append('finishTime', game.finishTime);
+    formData.append('score', game.score);
+
+    let url = 'http://127.0.0.1:5000/game';
+
+    fetch(url, {method: 'post',
+                body: formData
+    })
+        .then((response) => response.json())
+        .catch((error) => console.error(error));
+}
+
+function removeRow(gameId, gameTitle) {
+    if (confirm("Are you sure? This action cannot be undone.")) {
+                parentDiv.remove();
+                deleteGame(gameId, gameTitle);
+                alert(`"${gameTitle}" has been removed successfuly!`)
+    }  
+}
+
+function deleteGame(gameId, gameTitle) {
+    console.log(`Game ${gameTitle}(#${gameId}) will (maybe) be deleted!`)
+
+    let url = `http://127.0.0.1:5000/game?id=${gameId}&gameTitle=${encodeURIComponent(gameTitle)}`
+    fetch(url, {
+        method: "delete"
+    })
+        .then(response => response.json())
+        .catch(error => console.error(error));
 }
 
 function addGameToTable(game) {
-    let newGameRow = document.createElement("tr")
-    newGameRow.className = "game-row";
-
-    const gameTable = document.getElementById("game-table");
-    gameTable.appendChild(newGameRow);
+    let newGameRow = document.getElementById("game-row");
 
     // Image
-    const image_src = `${!game.image ? 'assets/game_image_placeholder.png' : game.image}`
+    const image_src = `${!game.imageUrl ? 'assets/game_image_placeholder.png' : game.imageUrl}`
     let image_cell = newGameRow.insertCell(0);
-    image_cell.innerHTML = `<img class='game-img' 
-                                src=${image_src}
-                                alt="${game.name}'s image">`
+    const gameImg = document.createElement("img");
+    gameImg.className = "game-img";
+    gameImg.src = image_src;
+    gameImg.alt = `${game.gameTitle}'s image`;
+    image_cell.appendChild(gameImg);
                                         
     //Name
     let name_cell = newGameRow.insertCell(1)
-    name_cell.className = "game-name";
-    name_cell.innerHTML = `<p>${game.name}</p>`
+    name_cell.className = "game-title";
+    const pGameTitle = document.createElement("p");
+    pGameTitle.textContent = game.gameTitle;
+    name_cell.appendChild(pGameTitle);
 
     //Developer
-    const dev_name = `${!game.developer ? '-' : `${game.developer}`}`
-
     let dev_cell = newGameRow.insertCell(2)
     dev_cell.className = "game-dev";
-    dev_cell.innerHTML = `<p>${dev_name}</p>`
-
-    //Publisher
-    const pub_name = `${!game.publisher ? '-' : `${game.publisher}`}`
-
-    let pub_cell = newGameRow.insertCell(3);
-    pub_cell.className = "game-publisher";
-    pub_cell.innerHTML = `<p>${pub_name}</p>`
+    const pDev = document.createElement("p");
+    pDev.textContent = game.dev_name;
+    dev_cell.appendChild(pDev);
 
     //Platform
-    let plat_cell = newGameRow.insertCell(4);
+    let plat_cell = newGameRow.insertCell(3);
     plat_cell.className = "game-platform";
-    plat_cell.innerHTML = `<p>${game.platform}</p>`
+    const pPlatform = document.createElement("p");
+    pPlatform.textContent(game.platform);
 
     //URL
-    const game_link = `${!game.link ? '-' : `<a target="_blank" href=${game.link}>${game.link}</a>`}`
-
-    let link_cell = newGameRow.insertCell(5);
-    link_cell.className = "game-link";
-    link_cell.innerHTML = `${game_link}`
+    let link_cell = newGameRow.insertCell(4);
+    link_cell.className = "game-url";
+    
+    if (!game.gameUrl) {
+        const pGameUrl = document.createElement("p");
+        pGameUrl.textContent("-");
+        link_cell.appendChild(pGameUrl);
+    } else {
+        const aGameUrl = document.createElement("a");
+        aGameUrl.target = "_blank";
+        aGameUrl.href = game.gameUrl;
+        aGameUrl.textContent = game.gameUrl;
+        link_cell.appendChild(aGameUrl);
+    }
 
     //Started at (date/time)
     let startedAt = "";
 
-    if (!game.startedAtDate && !game.startedAtTime) {
+    if (!game.startDate && !game.startTime) {
         startedAt = "-"
     } else {
         let fullStartDate = "??/??/??";
 
-        if (game.startedAtDate) {
-            const startDay = String(game.startedAtDate.getDate()).padStart(2, '0');
-            const startMonth = String(game.startedAtDate.getMonth() + 1).padStart(2, '0');
-            fullStartDate = `${startDay}/${startMonth}/${game.startedAtDate.getFullYear()}`
+        if (game.startDate) {
+            const startDay = String(game.startDate.getDate()).padStart(2, '0');
+            const startMonth = String(game.startDate.getMonth() + 1).padStart(2, '0');
+            fullStartDate = `${startDay}/${startMonth}/${game.startDate.getFullYear()}`
         } 
 
-        startedAt = `${fullStartDate} - ${!game.startedAtTime ? "??:??" : game.startedAtTime }`
+        startedAt = `${fullStartDate} - ${!game.startTime ? "??:??" : game.startTime }`
     }
 
-    let started_at_cell = newGameRow.insertCell(6)
+    let started_at_cell = newGameRow.insertCell(5)
     started_at_cell.className = "game-started-at"
-    started_at_cell.innerHTML = `<p>${startedAt}</p>`
+
+    const pStartedAt = document.createElement("p")
+    pStartedAt.textContent(startedAt);
+    started_at_cell.appendChild(pStartedAt);
 
     //Finished at (date/time)
     let finishedAt = "" 
 
-    if (!game.finishedAtDate && !game.finishedAtTime) {
+    if (!game.finishDate && !game.finishTime) {
         finishedAt = "-"
     } else {
         let fullFinishDate = "??/??/??";
 
-        if (game.finishedAtDate) {
-            const finishDay = String(game.finishedAtDate.getDate()).padStart(2, '0');
-            const finishMonth = String(game.finishedAtDate.getMonth() + 1).padStart(2, '0');
-            fullFinishDate = `${finishDay}/${finishMonth}/${game.finishedAtDate.getFullYear()}`
+        if (game.finishDate) {
+            const finishDay = String(game.finishDate.getDate()).padStart(2, '0');
+            const finishMonth = String(game.finishDate.getMonth() + 1).padStart(2, '0');
+            fullFinishDate = `${finishDay}/${finishMonth}/${game.finishDate.getFullYear()}`
         } 
 
-        const finishTime = !game.finishedAtTime ? "??:??" : game.finishedAtTime;
+        const finishTime = !game.finishTime ? "??:??" : game.finishTime;
 
         finishedAt = `${fullFinishDate} - ${finishTime}`
     }
 
-    let finished_at_cell = newGameRow.insertCell(7)
+    let finished_at_cell = newGameRow.insertCell(6)
     finished_at_cell.className = "game-finished-at"
-    finished_at_cell.innerHTML = `<p>${finishedAt}</p>`
+
+    const pFinishedAt = document.createElement("p");
+    pFinishedAt.textContent(finishedAt);
+    finished_at_cell.appendChild(pFinishedAt);
 
     //Score
     let classScore = ""
 
-    if (game.score <= 1) { // Ruim
-        classScore = "badScore";
-    } else if (game.score <= 2.5 ) { // Meh
-        classScore = "mehScore";
-    } else if (game.score <= 3.5) { // Ok
-        classScore = "okScore";
-    } else if (game.score <= 4.5) { // Bom
-        classScore = "goodScore";
-    } else if (game.score == 5.0) { // Muito Bom
-        classScore = "greatScore"
+    if (game.score != null) {
+        if (game.score <= 1) { // Ruim
+            classScore = "badScore";
+        } else if (game.score <= 2.5 ) { // Meh
+            classScore = "mehScore";
+        } else if (game.score <= 3.5) { // Ok
+            classScore = "okScore";
+        } else if (game.score <= 4.5) { // Bom
+            classScore = "goodScore";
+        } else if (game.score == 5.0) { // Muito Bom
+            classScore = "greatScore"
+        }
     }
 
-    let class_cell = newGameRow.insertCell(8);
-    class_cell.className = "game-score"
+    let score_cell = newGameRow.insertCell(7);
+    score_cell.className = "game-score"
 
-    const gameScore = game.score == null ? "-" : `${game.score.toFixed(1)}/5.0`;
+    const scoreVal = Number(game.score);
+    const gameScore = isNan(scoreVal) ? "-" : `${scoreVal.toFixed(1)}/5.0`;
 
-    class_cell.innerHTML = `<p class=${classScore}>${gameScore}</p>`
+    const pScore = document.createElement("p");
+    pScore.className = classScore;
+    pScore.textContent = gameScore;
+    score_cell.appendChild(pScore);
 
     //Actions
-    let actions_cell = newGameRow.insertCell(9);
+    let actions_cell = newGameRow.insertCell(8);
     actions_cell.className = "game-actions"
 
     let edit_btn = document.createElement("button")
-    edit_btn.className = "table-btn"
+    edit_btn.className = "table-edit-btn"
     edit_btn.textContent = "Edit"
     edit_btn.addEventListener("click", () => openCreateEditModal(game.id))
 
     let remove_btn = document.createElement("button")
-    remove_btn.className = "table-btn"
+    remove_btn.className = "table-remove-btn"
     remove_btn.textContent = "Remove"
+    remove_btn.onclick(() => removeRow(game.id, game.gameTitle));
 
     actions_cell.append(edit_btn, remove_btn)
 }

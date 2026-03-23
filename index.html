@@ -13,21 +13,18 @@
                 <div class="addEditModal">
                     <h2 id="add-edit-header">--</h2>
                     <form class="flexColumn" id="game-form" method="POST" enctype="multipart/form-data">
-                        <label class="formRequired" for="game-name">Game Name</label>
-                        <input id="game-name" name="gameName" type="text" required>
+                        <label class="formRequired" for="game-form-title">Game Name</label>
+                        <input id="game-form-title" name="gameName" type="text" required>
 
-                        <label class="formOptional" for="game-dev">Developer</label>
-                        <input id="game-dev" name="gameDev" type="text">
+                        <label class="formOptional" for="game-form-dev">Developer</label>
+                        <input id="game-form-dev" name="gameDev" type="text">
 
-                        <label class="formOptional" for="game-publisher">Publisher</label>
-                        <input id="game-publisher" name="gamePublisher" type="text">
-
-                        <label class="formRequired" for="game-platform">Platform</label>
+                        <label class="formRequired" for="game-form-platform">Platform</label>
                         (placeholder :>)
                         <!-- dropdown here -->
 
-                        <label class="formOptional" for="game-link">Link (URL)</label>
-                        <input id="game-link" type="text">
+                        <label class="formOptional" for="game-form-link">Link (URL)</label>
+                        <input id="game-form-link" type="text">
 
                         <label class="formRequired">Status:</label>
                         <div class="statusSelect">
@@ -44,28 +41,28 @@
                         <div id="started-at-info" class="DateTimeSelect hidden flexColumn">
                             <h3>Started at</h3>
                             
-                            <label class="formOptional" for="game-start-date">Date</label>
-                            <input type="date" id="game-start-date" name="gameStartDate" >
+                            <label class="formOptional" for="game-form-start-date">Date</label>
+                            <input type="date" id="game-form-start-date" name="gameStartDate" >
                             
-                            <label class="formOptional" for="game-start-hour">Time</label>
+                            <label class="formOptional" for="game-form-start-hour">Time</label>
                             <div class="flexRow">
-                                <input type="number" id="game-start-hour" name="gameStartHour" min="00" max="23">
+                                <input type="number" id="game-form-start-hour" name="gameStartHour" min="00" max="23">
                                 :
-                                <input type="number" id="game-start-minute" name="gameStartMinute" min="00" max="59">
+                                <input type="number" id="game-form-start-minute" name="gameStartMinute" min="00" max="59">
                             </div>
                         </div>
 
                         <div id="finished-at-info" class="DateTimeSelect hidden flexColumn">
                             <h3>Finished at</h3>
                             
-                            <label class="formOptional" for="game-finish-date">Date</label>
-                            <input type="date" id="game-finish-date" name="gameFinishDate" pattern="\d{2}-\d{2}-\d{4} >
+                            <label class="formOptional" for="game-form-finish-date">Date</label>
+                            <input type="date" id="game-form-finish-date" name="gameFinishDate" pattern="\d{2}-\d{2}-\d{4}">
                             
-                            <label class="formOptional" for="game-finish-hour">Time</label>
+                            <label class="formOptional" for="game-form-finish-hour">Time</label>
                             <div class="flexRow">
-                                <input type="number" id="game-finish-hour" name="gameFinishHour" min="00" max="23">
+                                <input type="number" id="game-form-finish-hour" name="gameFinishHour" min="00" max="23">
                                 :
-                                <input type="number" id="game-finish-minute" name="gameFinishMinute" min="00" max="59">
+                                <input type="number" id="game-form-finish-minute" name="gameFinishMinute" min="00" max="59">
                             </div>
                         </div>
 
@@ -84,16 +81,18 @@
         <main>
             <table id="game-table">
                 <tr align="center">
-                    <th>Imagem</th>
+                    <th>Image</th>
                     <th>Nome</th>
                     <th>Developer(s)</th>
-                    <th>Publisher</th>
                     <th>Platform</th>
                     <th>Link</th>
                     <th>Started at</th>
                     <th>Finished at</th>
                     <th>Score</th>
                     <th></th>
+                </tr>
+                <tr id="game-row">
+
                 </tr>
             </table>
         </main>
