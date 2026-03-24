@@ -1,6 +1,6 @@
 import { openCreateEditModal } from "./modal.js";
 
-class Game {
+export class Game {
     constructor(id,
                 imageUrl=undefined,
                 gameTitle,
@@ -49,14 +49,18 @@ function parseJsonToGameInstance(data) {
     return gameInstance;
 }
 
-async function getGameList() {
+export async function getGameList() {
     let url = 'http://127.0.0.1:5000/games';
     fetch(url, {method: 'get',})
         .then(response => response.json())
         .then(data => {
             console.log(data);
             
-            data.forEach(item => {
+            if (data.games.length == 0 ) {
+                showEmptyTableMsg();
+            }
+
+            data.games.forEach(item => {
                 const newGame = parseJsonToGameInstance(item);
                 addToList(newGame);
             })
@@ -66,28 +70,41 @@ async function getGameList() {
         })
 }
 
-getGameList(); 
-
 // Add game to database
-function addGameToDatabase(game) {
+export function addGameToDatabase(game) {
     const formData = new FormData();
     formData.append('imageUrl', game.imageUrl);
     formData.append('gameTitle', game.gameTitle);
     formData.append('developer', game.developer);
     formData.append('platform', game.platform);
     formData.append('gameUrl', game.gameUrl);
-    formData.append('startDate', game.startDate?.toISOString() ?? "");
-    formData.append('startTime', game.startTime);
-    formData.append('finishDate', game.finishDate?.toISOString() ?? "");
-    formData.append('finishTime', game.finishTime);
+    formData.append('startDate', game.startDate || "");
+    formData.append('startTime', game.startTime || "");
+    formData.append('finishDate', game.finishDate || "");
+    formData.append('finishTime', game.finishTime || "");
     formData.append('score', game.score);
+
+    console.log(formData)
 
     let url = 'http://127.0.0.1:5000/game';
 
     fetch(url, {method: 'post',
-                body: formData
+                body: JSON.stringify({
+                gameTitle: game.gameTitle,
+                developer: game.developer,
+                platform: game.platform,
+                gameUrl: game.gameUrl,
+                startDate: game.startDate || null,
+                startTime: game.startTime || null,
+                finishDate: game.finishDate || null,
+                finishTime: game.finishTime || null,
+                score: game.score ?? null
+            })
     })
-        .then((response) => response.json())
+        .then(response => response.json())
+        .then(data => {
+            console.log("RESPONSE:", data);
+        })
         .catch((error) => console.error(error));
 }
 
@@ -108,6 +125,17 @@ function deleteGame(gameId, gameTitle) {
     })
         .then(response => response.json())
         .catch(error => console.error(error));
+}
+
+function showEmptyTableMsg() {
+    let newGameRow = document.getElementById("game-row");
+
+    const pEmptyTable = document.createElement("td");
+    pEmptyTable.textContent = "No games! :(";
+    pEmptyTable.colSpan = 9;
+    pEmptyTable.style.padding = '20px 10px';
+    pEmptyTable.style.textAlign = 'center';
+    newGameRow.appendChild(pEmptyTable);
 }
 
 function addGameToTable(game) {

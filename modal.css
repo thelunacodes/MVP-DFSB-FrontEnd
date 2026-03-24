@@ -62,7 +62,8 @@
 .modalContainer label, 
 .modalContainer h1,
 .modalContainer h2,
-.modalContainer h3 {
+.modalContainer h3,
+.modalContainer option {
     user-select: none;
     margin: 0;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -79,7 +80,6 @@
 .statusSelect {
     display: flex;
     margin-bottom: 20px;
-    /* flex-direction: row; */
 }
 
 .statusSelect label {
@@ -87,8 +87,6 @@
 }
 
 .DateTimeSelect {
-    /* display: flex; */
-    /* flex-direction: column; */
     margin-top: 15px;
     border: 1px solid #E7E7E7;
     border-radius: 5px; 

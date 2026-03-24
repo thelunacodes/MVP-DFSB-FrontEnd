@@ -13,4 +13,4 @@ addGameBtn.addEventListener("click", () => modal.openCreateEditModal())
 const gameFormCancel = document.getElementById("game-form-cancel")
 gameFormCancel.addEventListener("click", modal.closeModal)
 
-games.loadGames();
+games.getGameList();

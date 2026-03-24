@@ -16,12 +16,13 @@
                         <label class="formRequired" for="game-form-title">Game Name</label>
                         <input id="game-form-title" name="gameName" type="text" required>
 
-                        <label class="formOptional" for="game-form-dev">Developer</label>
+                        <label class="formRequired" for="game-form-dev" required>Developer</label>
                         <input id="game-form-dev" name="gameDev" type="text">
 
                         <label class="formRequired" for="game-form-platform">Platform</label>
-                        (placeholder :>)
-                        <!-- dropdown here -->
+                        <select disabled id="game-form-platform" required>
+                            <option id="loading-placeholder">Loading...</option>
+                        </select>
 
                         <label class="formOptional" for="game-form-link">Link (URL)</label>
                         <input id="game-form-link" type="text">
@@ -46,9 +47,7 @@
                             
                             <label class="formOptional" for="game-form-start-hour">Time</label>
                             <div class="flexRow">
-                                <input type="number" id="game-form-start-hour" name="gameStartHour" min="00" max="23">
-                                :
-                                <input type="number" id="game-form-start-minute" name="gameStartMinute" min="00" max="59">
+                                <input type="time" id="game-form-start-time" name="gameStartTime">
                             </div>
                         </div>
 
@@ -56,14 +55,16 @@
                             <h3>Finished at</h3>
                             
                             <label class="formOptional" for="game-form-finish-date">Date</label>
-                            <input type="date" id="game-form-finish-date" name="gameFinishDate" pattern="\d{2}-\d{2}-\d{4}">
+                            <input type="date" id="game-form-finish-date" name="gameFinishDate">
                             
-                            <label class="formOptional" for="game-form-finish-hour">Time</label>
-                            <div class="flexRow">
-                                <input type="number" id="game-form-finish-hour" name="gameFinishHour" min="00" max="23">
-                                :
-                                <input type="number" id="game-form-finish-minute" name="gameFinishMinute" min="00" max="59">
-                            </div>
+                            <label class="formOptional" for="game-form-finish-time">Time</label>
+                            <input type="time" id="game-form-finish-time" name="gameFinishTime">
+                        </div>
+
+                        <div class="flexColumn hidden" id="score-info">
+                            <label for="game-form-score-input">Score</label>
+                            <input id="game-form-score-input" type="range" min="0" value="0" max="10" step="1">
+                            <p id="current-score">0.0</p>
                         </div>
 
                         <footer class="formFooter">
