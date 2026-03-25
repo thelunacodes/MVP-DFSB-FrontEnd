@@ -8,7 +8,7 @@
         <link rel="stylesheet" href="modal.css">
     </head>
     <body>
-        <div id="modal" class="modalBackground hidden">
+        <div id="modal" onclick="closeModal()" class="modalBackground hidden">
             <div class="modalContainer" id="modal-container" onclick="event.stopPropagation()">
                 <div class="addEditModal">
                     <h2 id="add-edit-header">--</h2>
@@ -21,7 +21,6 @@
 
                         <label class="formRequired" for="game-form-platform">Platform</label>
                         <select disabled id="game-form-platform" required>
-                            <option id="loading-placeholder">Loading...</option>
                         </select>
 
                         <label class="formOptional" for="game-form-link">Link (URL)</label>
@@ -68,7 +67,7 @@
                         </div>
 
                         <footer class="formFooter">
-                            <button id="game-form-cancel" type="button">Cancel</button>
+                            <button id="game-form-cancel" onclick="closeModal()" type="button">Cancel</button>
                             <button id="game-form-save" type="submit">Save</button>
                         </footer>
                     </form> 
@@ -77,28 +76,28 @@
         </div>
         <header>
             <h1 class="topheader">Game Backlog</h1>
-            <button id="add-game-btn">Add Game</button>
+            <button id="add-game-btn" onclick="openCreateEditModal()">Add Game</button>
         </header>
         <main>
             <table id="game-table">
-                <tr align="center">
-                    <th>Image</th>
-                    <th>Nome</th>
-                    <th>Developer(s)</th>
-                    <th>Platform</th>
-                    <th>Link</th>
-                    <th>Started at</th>
-                    <th>Finished at</th>
-                    <th>Score</th>
-                    <th></th>
-                </tr>
-                <tr id="game-row">
-
-                </tr>
+                <thead>
+                    <tr align="center">
+                        <th>Image</th>
+                        <th>Nome</th>
+                        <th>Developer(s)</th>
+                        <th>Platform</th>
+                        <th>Link</th>
+                        <th>Started at</th>
+                        <th>Finished at</th>
+                        <th>Score</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody id="game-table-body"></tbody>
             </table>
         </main>
 
-        <script type="module" src="index.js"></script>
+        <script src="index.js"></script>
         <!-- <script src="modal.js"></script> -->
     </body>
 </html>
