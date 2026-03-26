@@ -69,7 +69,15 @@ header button {
     background-color: #00CBFF;
 }
 
-.table-btn {
+.game-actions td {
+    vertical-align: middle;
+}
+
+.game-actions button {
     font-size: 1rem;
     padding: 5px;
+}
+
+.gameRemoveBtn {
+    margin-left: 5px;
 }

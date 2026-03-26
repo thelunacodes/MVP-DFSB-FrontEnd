@@ -13,6 +13,10 @@
                 <div class="addEditModal">
                     <h2 id="add-edit-header">--</h2>
                     <form class="flexColumn" id="game-form" method="POST" enctype="multipart/form-data">
+                        <label class="formOptional" for="game-form-image_url">Game Image (URL)</label>
+                        <input id="game-form-image_url" onblur="toggleImageTest()"  name="gameImage" type="text" required>
+                        <img id="game-form-image-example" src='assets/game_image_placeholder.png'; />
+
                         <label class="formRequired" for="game-form-title">Game Name</label>
                         <input id="game-form-title" name="gameName" type="text" required>
 
@@ -90,7 +94,7 @@
                         <th>Started at</th>
                         <th>Finished at</th>
                         <th>Score</th>
-                        <th></th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="game-table-body"></tbody>

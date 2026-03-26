@@ -13,7 +13,7 @@
 }
 
 .flexRow {
-    flex-direction: column;
+    flex-direction: row;
 }
 
 /* Add Edit Game */
@@ -104,4 +104,11 @@
 
 .formFooter button {
     font-size: 1rem;
+}
+
+#game-form-image-example {
+    margin: 20px;
+    width: 200px;
+    height: 200px;
+    align-self: center;
 }

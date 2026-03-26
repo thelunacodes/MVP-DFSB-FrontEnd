@@ -33,7 +33,7 @@ function addToList(game) {
 
 function parseJsonToGameInstance(data) {
     const gameInstance = new Game(data.id,
-                                data.img,
+                                data.imageUrl,
                                 data.gameTitle,
                                 data.developer,
                                 data.platform,
@@ -104,16 +104,17 @@ function addGameToDatabase(game) {
         .catch((error) => console.error(error));
 }
 
-function removeRow(gameId, gameTitle) {
+function removeRow(event, gameId, gameTitle) {
     if (confirm("Are you sure? This action cannot be undone.")) {
-                parentDiv.remove();
-                deleteGame(gameId, gameTitle);
-                alert(`"${gameTitle}" has been removed successfuly!`)
+        const gameRow = event.target.closest("tr");
+        gameRow.remove();
+        deleteGame(gameId, gameTitle);
+        alert(`"${gameTitle}" has been removed successfuly!`)
     }  
 }
 
 function deleteGame(gameId, gameTitle) {
-    console.log(`Game ${gameTitle}(#${gameId}) will (maybe) be deleted!`)
+    // console.log(`Game ${gameTitle}(#${gameId}) will (maybe) be deleted!`)
 
     let url = `http://127.0.0.1:5000/game?id=${gameId}&gameTitle=${encodeURIComponent(gameTitle)}`
     fetch(url, {
@@ -124,7 +125,6 @@ function deleteGame(gameId, gameTitle) {
 }
 
 function showEmptyTableMsg() {
-    // let gameTable = $element("game-table");
     let emptyTableRow = document.createElement("tr");
 
     const tdEmptyTable = document.createElement("td");
@@ -180,6 +180,10 @@ function createCell(gameRow, className, content) {
     return cell;
 }
 
+function clearGameTable() {
+    gameTable.innerHTML = "";
+}
+
 function createActions(row, game) {
     const cell = row.insertCell();
     cell.className = "game-actions";
@@ -189,15 +193,11 @@ function createActions(row, game) {
     edit.onclick = () => openCreateEditModal(game.id);
 
     const remove = document.createElement("button");
+    remove.className = "gameRemoveBtn"
     remove.textContent = "Remove";
-    remove.onclick = () => removeRow(game.id, game.gameTitle);
+    remove.onclick = (event) => removeRow(event, game.id, game.gameTitle);
 
     cell.append(edit, remove);
-}
-
-function clearGameTable() {
-    gameTable.innerHTML = "";
-
 }
 
 function addGameToTable(game) {
@@ -268,6 +268,7 @@ function closeModal() {
     let modal = $element("modal")
     
     $element("game-form").reset();
+    imageExample.src = 'assets/game_image_placeholder.png';
 
     toggleStartedFinishedAt("NOTPLAYED")
 
@@ -296,6 +297,7 @@ function openCreateEditModal(gameId=undefined) {
 }
 
 const formInputs = {
+    gameImageUrl: $element("game-form-image_url"),
     gametitle: $element("game-form-title"),
     dev: $element("game-form-dev"),
     platform: $element("game-form-platform"),
@@ -309,8 +311,8 @@ const formInputs = {
 
 let currentGameStatus = "";
 
+const imageExample = $element("game-form-image-example");
 const gamePlatformList = ["PC", "Playstation 1", "Playstation 2", "Playstation 3", "Playstation 4", "Playstation 5", "Playstation 6", "Xbox", "Xbox360", "Xbox One", "Xbox Series X/S", "NES", "SNES", "Nintendo 64", "GameCube", "Wii", "Wii U", "Game&Watch", "Gameboy", "Gameboy Color", "Gameboy Advance", "Nintendo DS", "Nintendo DSi", "Nintendo 3DS", "New Nintendo 3DS", "Virtual Boy", "Nintendo Switch", "Nintendo Switch 2", "Zeebo", "Atari 2600", "Atari 5200", "Atari 7800", "Atari XEGS", "Atari Lynx", "Atari Lynx II", "Atari Jaguar", "Atari VCS", "CD-i"]
-
 const gameScoreValues = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
 
 const hasStarted = () => currentGameStatus == "PLAYING" || currentGameStatus == "FINISHED"; 
@@ -321,7 +323,7 @@ gameForm.addEventListener("submit", function(event) {
 
     let newGame = new Game(
         undefined,
-        undefined,
+        formInputs.gameImageUrl.value,
         formInputs.gametitle.value,
         formInputs.dev.value,
         formInputs.platform.value,
@@ -398,70 +400,8 @@ function toggleStartedFinishedAt(status) {
     }
 }
 
+function toggleImageTest() {
+    imageExample.src = formInputs.gameImageUrl.value || 'assets/game_image_placeholder.png';
+} 
+
 getGameList();  // Retrieve games 
-
-const test_game1 = new Game (1, 
-                            "https://gamefaqs.gamespot.com/a/box/4/0/6/97406_front.jpg", 
-                            "My Health Coach: Stop Smoking with Allen Carr",
-                            "Ubsoft",
-                            "Nintendo DS",
-                            null,
-                            null,
-                            null,
-                            null,
-                            null,
-                            null);
-
-const test_game2 = new Game (2, 
-                            "https://gamefaqs.gamespot.com/a/box/4/0/6/97406_front.jpg", 
-                            "My Health Coach: Stop Smoking with Allen Carr",
-                            "Ubsoft",
-                            "Nintendo DS",
-                            null,
-                            new Date(),
-                            "20:33",
-                            null,
-                            null,
-                            null);
-
-const test_game3 = new Game (3, 
-                            "https://gamefaqs.gamespot.com/a/box/4/0/6/97406_front.jpg", 
-                            "My Health Coach: Stop Smoking with Allen Carr",
-                            "Ubsoft",
-                            "Nintendo DS",
-                            null,
-                            new Date(),
-                            "20:33",
-                            new Date(),
-                            "20:33",
-                            4.0);
-
-const test_game4 = new Game (3, 
-                            "https://gamefaqs.gamespot.com/a/box/4/0/6/97406_front.jpg", 
-                            "My Health Coach: Stop Smoking with Allen Carr",
-                            "Ubsoft",
-                            "Nintendo DS",
-                            null,
-                            null,
-                            "20:33",
-                            null,
-                            "20:33",
-                            4.0);
-
-const test_game5 = new Game (3, 
-                            "https://gamefaqs.gamespot.com/a/box/4/0/6/97406_front.jpg", 
-                            "My Health Coach: Stop Smoking with Allen Carr",
-                            "Ubsoft",
-                            "Nintendo DS",
-                            null,
-                            new Date(),
-                            null,
-                            null,
-                            null,
-                            4.0);
-
-// addGameToTable(test_game1);
-// addGameToTable(test_game2);
-// addGameToTable(test_game3);
-// addGameToTable(test_game4);
-// addGameToTable(test_game5);
