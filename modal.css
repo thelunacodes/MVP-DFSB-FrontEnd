@@ -1,109 +1,107 @@
-.hidden {
-    display: none;
-}
-
-.visible {
+.flex {
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.flexColumn {
-    flex-direction: column;
+.hidden {
+    display: none;
 }
 
-.flexRow {
-    flex-direction: row;
+.flexColumn { 
+    display: flex;
+    flex-direction: column; 
+}
+
+.flexRow { 
+    display: flex;
+    flex-direction: row; 
 }
 
 /* Add Edit Game */
-
-#add-edit-header {
-    margin-bottom: 20px;
-}
 
 .formRequired:after {
     color: red;
     content: " *";
 }
 
-.formOptional:after {
-    color: rgb(151, 151, 151);
-    font-size: 0.8rem;
-    content: " (Optional)";
-}
-
 .modalBackground {
-    position: fixed;
-    z-index: 999999;
-    background-color: #000000ce;
     width: 100vw;
     height: 100vh;
     top: 0;
     left: 0;
+    position: fixed;
+    z-index: 999999;
+    background-color: #000000ce;
 }
 
-.modalContainer {
+#modal-container {
     background-color: #ffffff;
     width: fit-content;
     height: fit-content;
+    max-height: 600px;
     padding: 20px;
     border: 1px solid #E7E7E7;
     border-radius: 15px;
-    max-height: 600px;
     overflow: scroll;
 }
 
-.modalContainer input {
+#modal-container input {
     font-size: 0.9rem;
 }
 
-.modalContainer p,
-.modalContainer label, 
-.modalContainer h1,
-.modalContainer h2,
-.modalContainer h3,
-.modalContainer option {
-    user-select: none;
+#modal-container p,
+#modal-container label, 
+#modal-container option {
     margin: 0;
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
-.modalContainer form {
+#modal-container form {
     display: flex;
 }
 
-.modalContainer label {
-    margin: 15px 0px 5px 0px;
-}
-
-.statusSelect {
+.formSection {
     display: flex;
-    margin-bottom: 20px;
+    margin-top: 15px;
 }
 
-.statusSelect label {
-    margin: 0px 10px 0px 0px;
+.formSection input {
+    margin-top: 3px;
+}
+
+.formSection h3 {
+    margin: 0px 0px 20px 0px;
 }
 
 .DateTimeSelect {
     margin-top: 15px;
     border: 1px solid #E7E7E7;
     border-radius: 5px; 
-    padding: 15px;
+    padding: 10px;
     align-items: center;
+    justify-content: center;
+}
+
+.DateTimeSelect input[type="date"],
+.DateTimeSelect input[type="time"] {
+    margin-bottom: 10px;
 }
 
 .DateTimeSelect label {
-    margin: 25px 0px 5px 0px;
+    margin: 15px 0px 5px 0px;
 }
 
 .formFooter {
-    margin-top: 10px;
+    margin-top: 30px;
 }
 
-.formFooter button {
+.Modalbtn {
     font-size: 1rem;
+    padding: 5px;
+}
+
+#add-edit-header {
+    margin: 0px 0px 20px 0px;
 }
 
 #game-form-image-example {
@@ -111,4 +109,13 @@
     width: 200px;
     height: 200px;
     align-self: center;
+}
+
+#score-toggle {
+    margin-top: 15px;
+}
+
+#score-toggle label {
+    margin: 0;
+    font-size: 1rem;
 }

@@ -9,40 +9,40 @@
     </head>
     <body>
         <div id="modal" onclick="closeModal()" class="modalBackground hidden">
-            <div class="modalContainer" id="modal-container" onclick="event.stopPropagation()">
+            <div id="modal-container" onclick="event.stopPropagation()">
                 <div class="addEditModal">
                     <h2 id="add-edit-header">--</h2>
                     <form class="flexColumn" id="game-form" method="POST" enctype="multipart/form-data">
-                        <label class="formOptional" for="game-form-image_url">Game Image (URL)</label>
-                        <input id="game-form-image_url" onblur="toggleImageTest()"  name="gameImage" type="text" required>
-                        <img id="game-form-image-example" src='assets/game_image_placeholder.png'; />
 
-                        <label class="formRequired" for="game-form-title">Game Name</label>
-                        <input id="game-form-title" name="gameName" type="text" required>
+                        <section class="flexColumn formSection">
+                            <label class="formOptional" for="game-form-image_url">Game Image (URL)</label>
+                            <input id="game-form-image_url" onblur="toggleImageTest()"  name="gameImage" type="text">
+                            <img id="game-form-image-example" src='assets/game_image_placeholder.png'; />
+                        </section>
+                            
+                        <section class="flexColumn formSection">
+                            <label class="formRequired" for="game-form-title">Game Name</label>
+                            <input id="game-form-title" name="gameName" type="text" required>
+                        </section>
+                        
+                        <section class="flexColumn formSection">
+                            <label class="formRequired" for="game-form-dev" required>Developer</label>
+                            <input id="game-form-dev" name="gameDev" type="text" required>
+                        </section>
+                        
+                        <section class="flexColumn formSection">
+                             <label class="formRequired" for="game-form-platform">Platform</label>
+                            <select disabled id="game-form-platform" required>
+                            </select>
+                        </section>
+                        
+                        <section class="flexColumn formSection">
+                            <label class="formOptional" for="game-form-link">Link (URL)</label>
+                            <input id="game-form-link" type="text">
+                        </section>
+                       
 
-                        <label class="formRequired" for="game-form-dev" required>Developer</label>
-                        <input id="game-form-dev" name="gameDev" type="text">
-
-                        <label class="formRequired" for="game-form-platform">Platform</label>
-                        <select disabled id="game-form-platform" required>
-                        </select>
-
-                        <label class="formOptional" for="game-form-link">Link (URL)</label>
-                        <input id="game-form-link" type="text">
-
-                        <label class="formRequired">Status:</label>
-                        <div class="statusSelect">
-                            <input type="radio" name="gameStatus" id="status-not-played" value="NOTPLAYED" checked>
-                            <label for="status-not-played">Not Played</label>
-
-                            <input type="radio" name="gameStatus" id="status-playing" value="PLAYING">
-                            <label for="status-playing">Playing</label>
-
-                            <input type="radio" name="gameStatus" id="status-finished" value="FINISHED">
-                            <label for="status-finished">Finished</label>
-                        </div>
-
-                        <div id="started-at-info" class="DateTimeSelect hidden flexColumn">
+                        <section class="formSection DateTimeSelect flexColumn">
                             <h3>Started at</h3>
                             
                             <label class="formOptional" for="game-form-start-date">Date</label>
@@ -52,27 +52,37 @@
                             <div class="flexRow">
                                 <input type="time" id="game-form-start-time" name="gameStartTime">
                             </div>
-                        </div>
+                        </section>
 
-                        <div id="finished-at-info" class="DateTimeSelect hidden flexColumn">
+                        <section class="formSection DateTimeSelect flexColumn ">
                             <h3>Finished at</h3>
                             
                             <label class="formOptional" for="game-form-finish-date">Date</label>
                             <input type="date" id="game-form-finish-date" name="gameFinishDate">
                             
                             <label class="formOptional" for="game-form-finish-time">Time</label>
-                            <input type="time" id="game-form-finish-time" name="gameFinishTime">
-                        </div>
+                            <div class="flexRow">
+                                <input type="time" id="game-form-finish-time" name="gameFinishTime">
+                            </div>
+                        </section>
 
-                        <div class="flexColumn hidden" id="score-info">
-                            <label for="game-form-score-input">Score</label>
-                            <input id="game-form-score-input" type="range" min="0" value="0" max="10" step="1">
-                            <p id="current-score">0.0</p>
-                        </div>
+                        <section class="flexColumn formSection">
+                            <div class="flexColumn flex">
+                                <label for="game-form-score-input">Score</label>
+                                <input id="game-form-score-input" type="range" min="0" value="0" max="10" step="1" disabled>
+                                <p id="current-score">0.0</p>
+                            </div>
 
+                            <div id="score-toggle" class="flexRow">
+                                <input type="checkbox" name="scoreCheck" id="score-check">
+                                <label for="score-check">Include Score</label>
+                            </div>
+                        </section>
+
+                        
                         <footer class="formFooter">
-                            <button id="game-form-cancel" onclick="closeModal()" type="button">Cancel</button>
-                            <button id="game-form-save" type="submit">Save</button>
+                            <button class="Modalbtn" onclick="closeModal()" type="button">Cancel</button>
+                            <button class="Modalbtn" type="submit">Save</button>
                         </footer>
                     </form> 
                 </div>
@@ -80,7 +90,7 @@
         </div>
         <header>
             <h1 class="topheader">Game Backlog</h1>
-            <button id="add-game-btn" onclick="openCreateEditModal()">Add Game</button>
+            <button class="btn" onclick="openCreateEditModal()">Add Game</button>
         </header>
         <main>
             <table id="game-table">

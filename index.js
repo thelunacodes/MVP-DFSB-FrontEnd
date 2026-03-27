@@ -38,9 +38,9 @@ function parseJsonToGameInstance(data) {
                                 data.developer,
                                 data.platform,
                                 data.gameUrl,
-                                data.startDate ? new Date(data.startDate) : null,
+                                data.startDate = data.startDate || null,
                                 data.startTime ? data.startTime : null,
-                                data.finishDate ? new Date(data.finishDate) : null,
+                                data.finishDate = data.finishDate || null,
                                 data.finishTime ? data.finishTime : null,
                                 data.score 
     );
@@ -105,11 +105,10 @@ function addGameToDatabase(game) {
 }
 
 function removeRow(event, gameId, gameTitle) {
-    if (confirm("Are you sure? This action cannot be undone.")) {
+    if (confirm(`Are you sure you want to delete this game?\n\n'${gameTitle}' will be lost forever! (A long time!)`)) {
         const gameRow = event.target.closest("tr");
         gameRow.remove();
         deleteGame(gameId, gameTitle);
-        alert(`"${gameTitle}" has been removed successfuly!`)
     }  
 }
 
@@ -138,6 +137,15 @@ function showEmptyTableMsg() {
     gameTable.appendChild(emptyTableRow)
 }
 
+function formatDate(dateStr) {
+    if (!dateStr) {
+        return "-";
+    }
+
+    const [year, month, day] = dateStr.split("-");
+    return `${day}/${month}/${year}`;
+}
+
 function formatScore(score) {
     if (score == null) {
         return "-";
@@ -153,10 +161,7 @@ function getDateTimeString(date, time) {
         let fullDate = "??/??/??";
   
         if (date) {
-            fullDate = date.toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric'});
+            fullDate = formatDate(date)
         } 
 
         dateTimeString = `${fullDate} - ${!time ? "??:??" : time }`
@@ -256,45 +261,18 @@ function addGameToTable(game) {
 }
 
 // MODAL
-
-function openModal() {
-    let modal = $element("modal")
-
-    modal.classList.remove("hidden");
-    modal.classList.add("visible");
-}
-
-function closeModal() {
-    let modal = $element("modal")
-    
-    $element("game-form").reset();
-    imageExample.src = 'assets/game_image_placeholder.png';
-
-    toggleStartedFinishedAt("NOTPLAYED")
-
-    modal.classList.remove("visible");
-    modal.classList.add("hidden");
-}
-
-//Add/Edit Game Form
+const modal = $element("modal")
 const gameForm = $element("game-form");
 const currentScore = $element("current-score");
+const imageExample = $element("game-form-image-example");
+const scoreToggleCheck = $element("score-check");
+const platformSelect = $element("game-form-platform");
+const modalContainer = $element("modal-container")
+const modalHeader = $element("add-edit-header")
 
-function openCreateEditModal(gameId=undefined) {
-    openModal();
-    loadPlatforms();  
-
-    let modalContainer = $element("modal-container")
-    modalContainer.scrollTop = 0;
-
-    let modalHeader = $element("add-edit-header")
-
-    if (gameId) {
-        modalHeader.innerHTML = "Edit Game";
-    } else {
-        modalHeader.innerHTML = "Add Game";
-    }
-}
+const gamePlatformList = ["PC", "Playstation 1", "Playstation 2", "Playstation 3", "Playstation 4", "Playstation 5", "Playstation 6", "Xbox", "Xbox360", "Xbox One", "Xbox Series X/S", "NES", "SNES", "Nintendo 64", "GameCube", "Wii", "Wii U", "Game&Watch", "Gameboy", "Gameboy Color", "Gameboy Advance", "Nintendo DS", "Nintendo DSi", "Nintendo 3DS", "New Nintendo 3DS", "Virtual Boy", "Nintendo Switch", "Nintendo Switch 2", "Zeebo", "Atari 2600", "Atari 5200", "Atari 7800", "Atari XEGS", "Atari Lynx", "Atari Lynx II", "Atari Jaguar", "Atari VCS", "CD-i"]
+const gameScoreValues = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
+let hasScore = scoreToggleCheck.checked;
 
 const formInputs = {
     gameImageUrl: $element("game-form-image_url"),
@@ -309,48 +287,33 @@ const formInputs = {
     score: $element("game-form-score-input")
 };
 
-let currentGameStatus = "";
+function closeModal() {
+    // Reset content
+    gameForm.reset();
+    imageExample.src = 'assets/game_image_placeholder.png';
+    currentScore.textContent = `${gameScoreValues[0]}`; 
 
-const imageExample = $element("game-form-image-example");
-const gamePlatformList = ["PC", "Playstation 1", "Playstation 2", "Playstation 3", "Playstation 4", "Playstation 5", "Playstation 6", "Xbox", "Xbox360", "Xbox One", "Xbox Series X/S", "NES", "SNES", "Nintendo 64", "GameCube", "Wii", "Wii U", "Game&Watch", "Gameboy", "Gameboy Color", "Gameboy Advance", "Nintendo DS", "Nintendo DSi", "Nintendo 3DS", "New Nintendo 3DS", "Virtual Boy", "Nintendo Switch", "Nintendo Switch 2", "Zeebo", "Atari 2600", "Atari 5200", "Atari 7800", "Atari XEGS", "Atari Lynx", "Atari Lynx II", "Atari Jaguar", "Atari VCS", "CD-i"]
-const gameScoreValues = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
+    modal.classList.remove("flex");
+    modal.classList.add("hidden");
+}
 
-const hasStarted = () => currentGameStatus == "PLAYING" || currentGameStatus == "FINISHED"; 
-const hasFinished = () => currentGameStatus == "FINISHED"; 
+function openCreateEditModal(gameId=undefined) {
+    modal.classList.remove("hidden");
+    modal.classList.add("flex");
 
-gameForm.addEventListener("submit", function(event) {
-    event.preventDefault();
+    loadPlatforms();  
 
-    let newGame = new Game(
-        undefined,
-        formInputs.gameImageUrl.value,
-        formInputs.gametitle.value,
-        formInputs.dev.value,
-        formInputs.platform.value,
-        formInputs.link.value,
-        hasStarted() ? formInputs.startDate.value || null : null,
-        hasStarted() ? formInputs.startTime.value || null : null,
-        hasFinished() ? formInputs.finishDate.value || null : null,
-        hasFinished() ? formInputs.finishTime.value || null : null,
-        hasFinished() ? gameScoreValues[formInputs.score.value] : null
-    );
+    modalContainer.scrollTop = 0;
 
-    addGameToDatabase(newGame);
-})
 
-formInputs.score.addEventListener("input", () => {
-    currentScore.textContent = `${gameScoreValues[formInputs.score.value]}`;
-})
-
-gameForm.addEventListener("change", function(event) {
-    if (event.target.type === "radio") {
-        currentGameStatus = event.target.value;
-        toggleStartedFinishedAt(currentGameStatus);
+    if (gameId) {
+        modalHeader.innerHTML = "Edit Game";
+    } else {
+        modalHeader.innerHTML = "Add Game";
     }
-})
+}
 
 function loadPlatforms() {
-    let platformSelect = $element("game-form-platform");
 
     let defaultOption = document.createElement("option");
     defaultOption.value = "";
@@ -368,40 +331,38 @@ function loadPlatforms() {
     platformSelect.disabled = false;
 }
 
-function toggleVisibleHidden(elements, show=true) {
-    if (!elements) {
-        return;
-    }
-
-    if (Array.isArray(elements)) {
-       elements.forEach(e => {
-            e.classList.remove(show ? "hidden" : "visible");
-            e.classList.add(show ? "visible" : "hidden");
-       }) 
-    }
-}
-
-function toggleStartedFinishedAt(status) {
-    let startedAtInfo = $element("started-at-info");
-    let finishedAtInfo = $element("finished-at-info");
-    let scoreInfo = $element("score-info");
-
-    switch(status) {
-        case "NOTPLAYED":
-            toggleVisibleHidden([startedAtInfo, finishedAtInfo, scoreInfo], false)
-            break;
-        case "PLAYING":
-            toggleVisibleHidden([startedAtInfo])
-            toggleVisibleHidden([finishedAtInfo, scoreInfo], false)
-            break;
-        case "FINISHED":
-            toggleVisibleHidden([startedAtInfo, finishedAtInfo, scoreInfo])
-            break;
-    }
-}
-
 function toggleImageTest() {
     imageExample.src = formInputs.gameImageUrl.value || 'assets/game_image_placeholder.png';
 } 
+
+gameForm.addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    let newGame = new Game(
+        undefined,
+        formInputs.gameImageUrl.value,
+        formInputs.gametitle.value,
+        formInputs.dev.value,
+        formInputs.platform.value,
+        formInputs.link.value,
+        formInputs.startDate.value || null,
+        formInputs.startTime.value || null,
+        formInputs.finishDate.value || null,
+        formInputs.finishTime.value || null,
+        hasScore ? gameScoreValues[formInputs.score.value] : null
+    );
+
+    addGameToDatabase(newGame);
+})
+
+formInputs.score.addEventListener("input", () => {
+    currentScore.textContent = `${gameScoreValues[formInputs.score.value]}`;
+})
+
+scoreToggleCheck.addEventListener("change", (event) => {
+    hasScore = scoreToggleCheck.checked;
+    formInputs.score.disabled = !scoreToggleCheck.checked;
+
+});
 
 getGameList();  // Retrieve games 
