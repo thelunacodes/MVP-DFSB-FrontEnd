@@ -28,11 +28,9 @@ const $element = id => document.getElementById(id);
 const gameTable = $element("game-table-body")
 
 const API_URL = "http://127.0.0.1:5000";
+const PLACEHOLDER_IMG_PATH = "assets/game_image_placeholder.png";
 
-function addToList(game) {
-    addGameToTable(game)
-}
-
+// Converts the JSON response into a "Game" instance
 function parseJsonToGameInstance(data) {
     const gameInstance = new Game(data.id,
                                 data.imageUrl,
@@ -50,6 +48,7 @@ function parseJsonToGameInstance(data) {
     return gameInstance;
 }
 
+// Retrieves a game from the database using its ID
 function getGameById(gameId) {
     let url = `${API_URL}/game?id=${gameId}`;
 
@@ -63,9 +62,10 @@ function getGameById(gameId) {
         });
 }
 
+// Retrieves all registered games from the database
 async function getGameList() {
     let url = `${API_URL}/games`;
-    fetch(url, {method: 'get',})
+    fetch(url, {method: "get",})
         .then(response => response.json())
         .then(data => {
             if (data.games.length == 0 ) {
@@ -74,7 +74,7 @@ async function getGameList() {
 
             data.games.forEach(item => {
                 const newGame = parseJsonToGameInstance(item);
-                addToList(newGame);
+                addGameToTable(newGame);
             })
         })
         .catch((error) => {
@@ -82,12 +82,14 @@ async function getGameList() {
         })
 }
 
+// Validates data from the add/edit form, before putting it into a FormData
 function formDataValidation(formData, key, value) {
     if (value !== undefined && value !== null && value !== "" ) {
         formData.append(key, value);
     }
 }
 
+// Builds the FormData for adding/updating a game
 function buildFormData(game, update=false) {
     const formVar = new FormData();
     
@@ -106,31 +108,24 @@ function buildFormData(game, update=false) {
     return formVar;
 }
 
-// Add game to database
+// Adds/updates a game 
 function addUpdateGame(game, isUpdate) {
     const formData = buildFormData(game, isUpdate);
     let url = `${API_URL}/game`;
 
-    fetch(url, {method: isUpdate ? 'put' : 'post',
+    fetch(url, {method: isUpdate ? "put" : "post",
                 body: formData
     })
         .then(response => response.json())
         .then(_ => {
-            clearGameTable();
+            gameTable.innerHTML = "";
             getGameList();  
             closeModal();
         })
         .catch((error) => console.error(error));
 }
 
-function removeRow(event, gameId, gameTitle) {
-    if (confirm(`Are you sure you want to delete this game?\n\n'${gameTitle}' will be lost forever! (A long time!)`)) {
-        const gameRow = event.target.closest("tr");
-        gameRow.remove();
-        deleteGame(gameId, gameTitle);
-    }  
-}
-
+// Deletes a game from the database
 function deleteGame(gameId, gameTitle) {
     let url = `${API_URL}/game?id=${gameId}&gameTitle=${encodeURIComponent(gameTitle)}`
     fetch(url, {
@@ -140,20 +135,22 @@ function deleteGame(gameId, gameTitle) {
         .catch(error => console.error(error));
 }
 
+// Displays "No games! :(" as a row in the games table
 function showEmptyTableMsg() {
     let emptyTableRow = document.createElement("tr");
 
     const tdEmptyTable = document.createElement("td");
     tdEmptyTable.textContent = "No games! :(";
     tdEmptyTable.colSpan = 9;
-    tdEmptyTable.style.padding = '20px 10px';
-    tdEmptyTable.style.textAlign = 'center';
+    tdEmptyTable.style.padding = "20px 10px";
+    tdEmptyTable.style.textAlign = "center";
     
     emptyTableRow.appendChild(tdEmptyTable);
 
     gameTable.appendChild(emptyTableRow)
 }
 
+// Formats a date (DD/MM/YYYY format)
 function formatDate(dateStr) {
     if (!dateStr) {
         return "-";
@@ -163,6 +160,7 @@ function formatDate(dateStr) {
     return `${day}/${month}/${year}`;
 }
 
+// Formats a score (X.X/5.0 format)
 function formatScore(score) {
     if (score == null) {
         return "-";
@@ -171,6 +169,7 @@ function formatScore(score) {
     return `${Number(score).toFixed(1)}/5.0`
 }
 
+// Returns a string containing a date and a time (if available)
 function getDateTimeString(date, time) {
     let dateTimeString = "-";
 
@@ -186,8 +185,9 @@ function getDateTimeString(date, time) {
     return dateTimeString;
 }
 
-function createCell(gameRow, className, content) {
-    const cell = gameRow.insertCell();
+// Creates a cell and inserts it into the row
+function createCell(row, className, content) {
+    const cell = row.insertCell();
 
     if (className) {
         cell.className = className;
@@ -202,53 +202,66 @@ function createCell(gameRow, className, content) {
     return cell;
 }
 
-function clearGameTable() {
-    gameTable.innerHTML = "";
-}
-
+/* 
+    Creates a "actions" cell, containing an "edit", "remove" and, 
+    if needed, a "view game" button. 
+*/
 function createActions(row, game) {
     const cell = row.insertCell();
     cell.className = "game-actions";
 
+    const buttonDiv = document.createElement("div");
+    buttonDiv.className = "actionsBtnDiv"
+
     const edit = document.createElement("button");
+    edit.className = "tableBtn";
     edit.textContent = "Edit";
-    edit.onclick = () => openModal(game.id);
+    edit.onclick = () => showAddEditModal(game.id);
 
     const remove = document.createElement("button");
-    remove.className = "gameRemoveBtn"
+    remove.className = "tableBtn";
     remove.textContent = "Remove";
-    remove.onclick = (event) => removeRow(event, game.id, game.gameTitle);
+    remove.onclick = (event) => showConfirmRemoveModal(event, game.id, game.gameTitle);
+
+    buttonDiv.append(edit, remove);
 
     if (game.gameUrl) {
-        const goToPage = document.createElement("input");
-        goToPage.className = "goToPageBtn";
-        goToPage.type = "button";
-        goToPage.textContent = "Game Page"
+        const viewGameBtn = document.createElement("input");
+        viewGameBtn.className = "tableBtn";
+        viewGameBtn.type = "button";
+        viewGameBtn.value = "View Game"
+        viewGameBtn.onclick = () => window.open(game.gameUrl, "_blank").focus();    
         
+        buttonDiv.appendChild(viewGameBtn);
     }
 
-    cell.append(edit, remove);
+    cell.append(buttonDiv);
 }
 
-function validateURL(str) {
+// Validates an URL
+function validateURL(urlStr) {
     let url;
 
     try {
-        url = new URL(str);
+        if (urlStr.startsWith("https://") || urlStr.startsWith("http://")) {
+            url = new URL(urlStr);
+        } else { 
+            url = new URL("https://" + urlStr);
+        }
+            return (url.protocol === "http:" || url.protocol === "https:") && url.hostname.includes(".");
     } catch (_) {
         return false;
-    }
-
-    return url.protocol === "http:" || url.protocol === "https:";
+    }   
 }
 
+// Adds game to table
 function addGameToTable(game) {
     let newGameRow = document.createElement("tr");
 
     // Image
     const gameImg = document.createElement("img");
     gameImg.className = "game-img";
-    gameImg.src = game.imageUrl || 'assets/game_image_placeholder.png';
+    gameImg.src = game.imageUrl || PLACEHOLDER_IMG_PATH;
     gameImg.alt = `${game.gameTitle}'s image`;
 
     createCell(newGameRow, null, gameImg);  // Image                 
@@ -286,19 +299,57 @@ function addGameToTable(game) {
     gameTable.appendChild(newGameRow); 
 }
 
-// MODAL
-const modal = $element("modal")
-const gameForm = $element("game-form");
-const currentScore = $element("current-score");
-const imageExample = $element("game-form-image-example");
-const scoreToggleCheck = $element("score-check");
-const platformSelect = $element("game-form-platform");
+// CORE MODAL ELEMENTS
+const modalBase = $element("modal")
 const modalContainer = $element("modal-container")
-const modalHeader = $element("add-edit-header")
 
+
+const modalList = {
+    ADD_EDIT: $element("add-edit-modal"),
+    CONFIRM_REMOVE: $element("remove-confirm-modal")
+}
+
+// Displays the modal :p
+function openModal() {
+    modalBase.classList.remove("hidden");
+    modalBase.classList.add("flex");
+}
+
+// Hides the modal :p
+function closeModal() {
+    hideAllModals();
+
+    // Reset modal content
+    if (!modalList.ADD_EDIT.classList.contains("hidden")) {
+        resetAddEditModal();
+    }
+
+    modalBase.classList.remove("flex");
+    modalBase.classList.add("hidden");
+}
+
+// Hides all modal content
+function hideAllModals() {
+    Object.values(modalList).forEach(modal => {
+        modal.classList.add("hidden");
+        modal.classList.remove("flex");
+    });
+}
+
+// ADD/EDIT MODAL
+const gameForm = $element("game-form");
+const modalHeader = $element("add-edit-header")
+const imageExample = $element("game-form-image-example");
+
+const platformSelect = $element("game-form-platform");
 const gamePlatformList = ["PC", "Playstation 1", "Playstation 2", "Playstation 3", "Playstation 4", "Playstation 5", "Playstation 6", "Xbox", "Xbox360", "Xbox One", "Xbox Series X/S", "NES", "SNES", "Nintendo 64", "GameCube", "Wii", "Wii U", "Game&Watch", "Gameboy", "Gameboy Color", "Gameboy Advance", "Nintendo DS", "Nintendo DSi", "Nintendo 3DS", "New Nintendo 3DS", "Virtual Boy", "Nintendo Switch", "Nintendo Switch 2", "Zeebo", "Atari 2600", "Atari 5200", "Atari 7800", "Atari XEGS", "Atari Lynx", "Atari Lynx II", "Atari Jaguar", "Atari VCS", "CD-i"]
-const gameScoreValues = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
+
+const currentScore = $element("current-score");
+const scoreToggleCheck = $element("score-check");
+
 let hasScore = scoreToggleCheck.checked;
+const gameScoreValues = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
+
 let updating = false;
 let updateId = 0;
 
@@ -315,23 +366,27 @@ const formInputs = {
     score: $element("game-form-score-input")
 };
 
-function closeModal() {
-    // Reset content
+// Resets the Add/Edit modal
+function resetAddEditModal() {
     hasScore = false;
     updating = false;
     updateId = 0;
     gameForm.reset();
-    imageExample.src = 'assets/game_image_placeholder.png';
+    imageExample.src = PLACEHOLDER_IMG_PATH;
     formInputs.score.disabled = true;
     currentScore.textContent = `${gameScoreValues[0]}`; 
-
-    modal.classList.remove("flex");
-    modal.classList.add("hidden");
 }
 
-async function openModal(gameId=undefined) {
-    modal.classList.remove("hidden");
-    modal.classList.add("flex");
+// Displays the Add/Edit modal
+function showAddEditModal(gameId=undefined) {
+    openModal();
+    
+    modalContainer.scrollTop = 0;
+
+    modalContainer.className = "scrollable";
+    modalList.ADD_EDIT.classList.remove("hidden");
+    modalList.ADD_EDIT.classList.add("flex");
+
     updating = gameId != null;
 
     // console.log(updating ? "UPDATE" : "CREATE")
@@ -341,20 +396,42 @@ async function openModal(gameId=undefined) {
     if (updating) {
         modalHeader.innerHTML = "Edit Game";
         updateId = gameId;
-        getGameById(gameId)
+        // getGameById(gameId)
     } else {    
         modalHeader.innerHTML = "Add Game";
     }
 
-    modalContainer.scrollTop = 0;
+    formInputs.gameImageUrl.focus();
 }
 
-function scoreCheck(game) {
-    if (game.score < 0 || game.score > 5) {
-        game.score = undefined;
+// Displays the "remove game confirmation" modal
+function showConfirmRemoveModal(event, gameId, gameTitle) {
+    openModal();
+
+    // Remove Scroll
+    if (modalContainer.classList.contains("scrollable")) {
+        modalContainer.classList.remove("scrollable")
+    }
+
+    modalList.CONFIRM_REMOVE.classList.remove("hidden");
+    modalList.CONFIRM_REMOVE.classList.add("flex");
+    
+    const removeGameLabel = $element("remove-confirm-label")
+    removeGameLabel.textContent = `'${gameTitle}' will be lost forever! (A long time!)`;
+
+    const confirmBtn = $element("remove-confirm-btn")
+    confirmBtn.onclick = () => { 
+        // deleteGame(gameId, gameTitle)
+        // const gameRow = event.target.closest("tr");
+        // gameRow.remove();
+        console.log("DELETOU UAU");
+        // gameTable.innerHTML = "";  
+        // getGameList();  
+        closeModal();
     }
 }
 
+// Loads game data to the "edit game" form
 function loadEditGameForm(game) {
     formInputs.gameImageUrl.value = game.imageUrl || "";
     toggleImageTest(); // Update example image (if needed)
@@ -366,13 +443,13 @@ function loadEditGameForm(game) {
     formInputs.startTime.value = game.startTime || "";
     formInputs.finishDate.value = game.finishDate || "";
     formInputs.finishTime.value = game.finishTime || "";
-    scoreCheck(game); // Score value validation
     formInputs.score.value = gameScoreValues.indexOf(game.score) || 0;
     currentScore.textContent = game.score || 0;
     formInputs.score.disabled = game.score == null;
     scoreToggleCheck.checked = game.score != null;
 }
 
+// Loads the names from "gamePlatformList" to the "platform" selection input
 function loadPlatforms() {
     platformSelect.innerHTML = ""; 
 
@@ -393,44 +470,130 @@ function loadPlatforms() {
     platformSelect.disabled = false;
 }
 
+/* 
+    Validates and displays the image from the URL entered by the user (also
+    displays a warning, if needed)
+*/
 function toggleImageTest() {
-    imageExample.src = validateURL(formInputs.gameImageUrl.value) ? formInputs.gameImageUrl.value : 'assets/game_image_placeholder.png';
+    const imageUrlValue = formInputs.gameImageUrl.value.trim();
+    formInputs.gameImageUrl.setCustomValidity("");
+
+    imageExample.src = imageUrlValue || PLACEHOLDER_IMG_PATH;
+
+    imageExample.onerror = () => {
+        // console.log("IMAGEM INVÁLIDA!")
+        imageExample.src = PLACEHOLDER_IMG_PATH;
+        formInputs.gameImageUrl.setCustomValidity("Please enter a valid URL or leave it empty.");
+    }
 } 
 
+function updateTimeLimit(startDate, endDate, startTime, endTime) {
+    if ((startDate.value && endDate.value) && 
+        (startDate.value == endDate.value)) {
+            endTime.min = startTime.value || "";
+            startTime.max = endTime.value || "";
+    } else {
+        endTime.removeAttribute("min");
+        startTime.removeAttribute("max");
+    }
+}
+
+//Force all the other (invalid form input) warnigns to be in english
+formInputs.link.addEventListener("invalid", () => {
+    const gameUrlValue = formInputs.link.value.trim();
+    formInputs.link.setCustomValidity("");
+
+    if (gameUrlValue !== "" && formInputs.link.validity.typeMismatch) {
+        formInputs.link.setCustomValidity("Please enter a valid URL or leave it empty.")
+    }
+})
+
+formInputs.gameTitle.addEventListener("invalid", () => {
+    formInputs.gameTitle.setCustomValidity("");
+
+    if (formInputs.gameTitle.validity.valueMissing) {
+        formInputs.gameTitle.setCustomValidity("Please enter a game title!");
+    }
+})
+
+formInputs.dev.addEventListener("invalid", () => {
+    formInputs.dev.setCustomValidity("");
+
+    if (formInputs.dev.validity.valueMissing) {
+        formInputs.dev.setCustomValidity("Please enter a developer!");
+    }
+})
+
+formInputs.platform.addEventListener("invalid", () => {
+    formInputs.platform.setCustomValidity("");
+
+    if (formInputs.platform.validity.valueMissing) {
+        formInputs.platform.setCustomValidity("Please enter a platform!");
+    }
+})
+
+formInputs.startDate.addEventListener("invalid", () => {
+    formInputs.startDate.setCustomValidity("");
+
+    if (formInputs.startDate.validity.rangeOverflow) {
+        formInputs.startDate.setCustomValidity(`The 'start date' must be before ${formatDate(formInputs.finishDate.value)}`);
+    } 
+})
+
+formInputs.finishDate.addEventListener("invalid", () => {
+    formInputs.finishDate.setCustomValidity("");
+
+    if (formInputs.finishDate.validity.rangeUnderflow) {
+        formInputs.finishDate.setCustomValidity(`The 'finish date' must be after ${formatDate(formInputs.startDate.value)}`);
+    } 
+})
+
+formInputs.startTime.addEventListener("invalid", () => {
+    formInputs.startTime.setCustomValidity("");
+
+    if (formInputs.startTime.validity.rangeOverflow) {
+        formInputs.startTime.setCustomValidity(`The 'start time' must be before ${formInputs.finishTime.value}`);
+    } 
+})
+
+formInputs.finishTime.addEventListener("invalid", () => {
+    formInputs.finishTime.setCustomValidity("");
+
+    if (formInputs.finishTime.validity.rangeUnderflow) {
+        formInputs.finishTime.setCustomValidity(`The 'finish time' must be after ${formInputs.startTime.value}`);
+    } 
+})
+
+
+
+//Sets min/max date for start/finish inputs
+formInputs.startDate.addEventListener("change", () => {
+    if (formInputs.startDate.value) {
+        formInputs.finishDate.min = formInputs.startDate.value;        
+    } else {
+        formInputs.finishDate.removeAttribute("min");
+    }
+
+    updateTimeLimit(formInputs.startDate, formInputs.finishDate, formInputs.startTime, formInputs.finishTime)
+})
+
+formInputs.finishDate.addEventListener("change", () => {
+    if (formInputs.finishDate.value) {
+        formInputs.startDate.max = formInputs.finishDate.value;
+    } else {
+        formInputs.startDate.removeAttribute("max");
+    }
+
+    updateTimeLimit(formInputs.startDate, formInputs.finishDate, formInputs.startTime, formInputs.finishTime)
+})
+
+formInputs.startTime.addEventListener("change", () => { updateTimeLimit(formInputs.startDate, formInputs.finishDate, formInputs.startTime, formInputs.finishTime)});
+
+formInputs.finishTime.addEventListener("change", () => { updateTimeLimit(formInputs.startDate, formInputs.finishDate, formInputs.startTime, formInputs.finishTime)});
+
+// Submits the form data
 gameForm.addEventListener("submit", function(event) {
     event.preventDefault();
-    const invalidURLMsg = (fieldName) => `"Oops! The URL you've entered at '${fieldName}' is invalid! Please enter a valid URL or leave it empty."`
-
-    // URL Validation
-    if (formInputs.gameImageUrl.value.trim() != "" && !validateURL(formInputs.gameImageUrl.value)) {
-        alert(invalidURLMsg("Game Image (URL)"))
-        return;
-    }
-
-    if (formInputs.link.value.trim() != "" && !validateURL(formInputs.link.value)) {
-        alert(invalidURLMsg("Link (URL)"))
-        return;
-    }
-
-    // Date/Time Validation
-    const startDateValue = formInputs.startDate.value;
-    const startTimeValue = formInputs.startTime.value;
-    const finishDateValue = formInputs.finishDate.value;
-    const finishTimeValue = formInputs.finishTime.value;
-
-    if (startDateValue && finishDateValue) {
-        if (finishDateValue < startDateValue) {
-            alert("The 'Finished At' date must be after the 'Started At' date.")
-            return;
-        } 
-
-        if (startDateValue === finishDateValue) {
-            if (finishTimeValue < startTimeValue) {
-                alert("The 'Finished At' time must be after the 'Started At' time.")
-                return;
-            }
-        }
-    }
 
     let game = new Game(
         updating ? updateId : undefined,
@@ -446,33 +609,37 @@ gameForm.addEventListener("submit", function(event) {
         hasScore ? gameScoreValues[formInputs.score.value] : null
     );
 
-    addUpdateGame(game, updating);
+    console.log("JOGO SALVO")
+    console.log(game)
+    // addUpdateGame(game, updating);
 })
 
+// Updates label underneath the score scroll with the current score value
 formInputs.score.addEventListener("input", () => {
     currentScore.textContent = `${gameScoreValues[formInputs.score.value]}`;
 })
 
+// Enables/Disables score input 
 scoreToggleCheck.addEventListener("change", (event) => {
     hasScore = scoreToggleCheck.checked;
     formInputs.score.disabled = !scoreToggleCheck.checked;
 
 });
 
-getGameList();  // Retrieve games 
+// getGameList();  // Retrieve games 
 
-// const testGame = new Game(
-//     1, 
-//     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZbB_doR9LVg_xVbDXOOZc3TNbgNCEIzLLKw&s",
-//     "Orange: The game",
-//     "Adam Sandler",
-//     "Zeebo",
-//     "https://www.google.com",
-//     undefined,
-//     "22:30",
-//     undefined,
-//     undefined,
-//     2.0
-// )
+const testGame = new Game(
+    1, 
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZbB_doR9LVg_xVbDXOOZc3TNbgNCEIzLLKw&s",
+    "Orange: The game",
+    "Adam Sandler",
+    "Zeebo",
+    "https://www.google.com",
+    undefined,
+    "22:30",
+    undefined,
+    undefined,
+    2.0
+)
 
-// addGameToTable(testGame);
+addGameToTable(testGame);

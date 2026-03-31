@@ -84,6 +84,13 @@ header, main {
     vertical-align: middle;
 }
 
-.gameRemoveBtn {
-    margin-left: 5px;
+.tableBtn { 
+    font-size: 1rem;
+    padding: 2px 5px;
+}
+
+.actionsBtnDiv {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }

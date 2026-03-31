@@ -10,19 +10,19 @@
     <body>
         <div id="modal" onclick="closeModal()" class="modalBackground hidden">
             <div id="modal-container" onclick="event.stopPropagation()">
-                <div class="addEditModal">
+                <div id="add-edit-modal" class="flexColumn hidden">
                     <h2 id="add-edit-header">--</h2>
                     <form class="flexColumn" id="game-form" method="POST" enctype="multipart/form-data">
 
                         <section class="flexColumn formSection">
                             <label class="formOptional" for="game-form-image_url">Game Image (URL)</label>
-                            <input id="game-form-image_url" onblur="toggleImageTest()"  name="gameImage" type="text">
+                            <input id="game-form-image_url" onblur="toggleImageTest()"  name="gameImage" type="url">
                             <img id="game-form-image-example" src='assets/game_image_placeholder.png'; />
                         </section>
                             
                         <section class="flexColumn formSection">
-                            <label class="formRequired" for="game-form-title">Game Name</label>
-                            <input id="game-form-title" name="gameName" type="text" required>
+                            <label class="formRequired" for="game-form-title">Game Title</label>
+                            <input id="game-form-title" name="gameTitle" type="text" required>
                         </section>
                         
                         <section class="flexColumn formSection">
@@ -38,7 +38,7 @@
                         
                         <section class="flexColumn formSection">
                             <label class="formOptional" for="game-form-link">Link (URL)</label>
-                            <input id="game-form-link" type="text">
+                            <input id="game-form-link" type="url">
                         </section>
                        
 
@@ -46,7 +46,7 @@
                             <h3>Started at</h3>
                             
                             <label class="formOptional" for="game-form-start-date">Date</label>
-                            <input type="date" id="game-form-start-date" name="gameStartDate" >
+                            <input type="date" id="game-form-start-date" name="gameStartDate">
                             
                             <label class="formOptional" for="game-form-start-hour">Time</label>
                             <div class="flexRow">
@@ -81,15 +81,24 @@
 
                         <footer class="formFooter">
                             <button class="Modalbtn" onclick="closeModal()" type="button">Cancel</button>
-                            <button class="Modalbtn" type="submit">Save</button>
+                            <button class="Modalbtn" id="game-save-btn" type="submit">Save</button>
                         </footer>
                     </form> 
+                </div>
+
+                <div id="remove-confirm-modal" class="flexColumn hidden">
+                    <h3>Are you sure?</h3>
+                    <p id="remove-confirm-label"></p>
+                    <div class="removeConfirmFooter flexRow">
+                        <button class="Modalbtn" onclick="closeModal()" type="button">Cancel</button>
+                        <button class="Modalbtn" id="remove-confirm-btn">Confirm</button>
+                    </div>
                 </div>
             </div>
         </div>
         <header>
             <h1 class="topheader">Game Backlog</h1>
-            <button class="btn" onclick="openModal()">Add Game</button>
+            <button class="btn" onclick="showAddEditModal()">Add Game</button>
         </header>
         <main>
             <table id="game-table">
@@ -99,7 +108,6 @@
                         <th>Nome</th>
                         <th>Developer(s)</th>
                         <th>Platform</th>
-                        <!-- <th>Link</th> -->
                         <th>Started at</th>
                         <th>Finished at</th>
                         <th>Score</th>

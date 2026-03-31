@@ -5,7 +5,7 @@
 }
 
 .hidden {
-    display: none;
+    display: none !important;
 }
 
 .flexColumn { 
@@ -18,12 +18,20 @@
     flex-direction: row; 
 }
 
-/* Add Edit Game */
+#add-edit-modal {
+    margin: 20px;
+}
 
 .formRequired:after {
     color: red;
     content: " *";
 }
+
+/* .formWarning {
+    font-size: 0.8rem;
+    color: red;
+    font-style: italic;
+} */
 
 .modalBackground {
     width: 100vw;
@@ -35,15 +43,17 @@
     background-color: #000000ce;
 }
 
+.scrollable {
+    overflow-y: scroll;
+}
+
 #modal-container {
     background-color: #ffffff;
     width: fit-content;
     height: fit-content;
     max-height: 600px;
-    padding: 20px;
     border: 1px solid #E7E7E7;
     border-radius: 15px;
-    overflow: scroll;
 }
 
 #modal-container input {
@@ -98,7 +108,7 @@
 
 .Modalbtn {
     font-size: 1rem;
-    padding: 5px;
+    padding: 5px 10px;
 }
 
 #add-edit-header {
@@ -119,4 +129,17 @@
 #score-toggle label {
     margin: 0;
     font-size: 1rem;
+}
+
+#remove-confirm-modal {
+    margin: 15px;
+}
+
+#remove-confirm-modal h3 {
+    margin: 0px 0px 15px 0px;
+}
+
+.removeConfirmFooter {
+    margin-top: 20px;
+    gap: 5px;
 }
