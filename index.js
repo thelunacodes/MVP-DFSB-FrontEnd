@@ -27,6 +27,8 @@ class Game {
 const $element = id => document.getElementById(id); 
 const gameTable = $element("game-table-body")
 
+const API_URL = "http://127.0.0.1:5000";
+
 function addToList(game) {
     addGameToTable(game)
 }
@@ -38,18 +40,31 @@ function parseJsonToGameInstance(data) {
                                 data.developer,
                                 data.platform,
                                 data.gameUrl,
-                                data.startDate = data.startDate || null,
-                                data.startTime ? data.startTime : null,
-                                data.finishDate = data.finishDate || null,
-                                data.finishTime ? data.finishTime : null,
+                                data.startDate || null,
+                                data.startTime || null,
+                                data.finishDate || null,
+                                data.finishTime || null,
                                 data.score 
     );
 
     return gameInstance;
 }
 
+function getGameById(gameId) {
+    let url = `${API_URL}/game?id=${gameId}`;
+
+    return fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            loadEditGameForm(data);
+        })
+        .catch(err => {
+            console.error(err);
+        });
+}
+
 async function getGameList() {
-    let url = 'http://127.0.0.1:5000/games';
+    let url = `${API_URL}/games`;
     fetch(url, {method: 'get',})
         .then(response => response.json())
         .then(data => {
@@ -73,40 +88,39 @@ function formDataValidation(formData, key, value) {
     }
 }
 
+function buildFormData(game, update=false) {
+    const formVar = new FormData();
+    
+    if (update) { formDataValidation(formVar, "id", game.id)};
+    formDataValidation(formVar, "imageUrl", game.imageUrl);
+    formDataValidation(formVar, "gameTitle", game.gameTitle);
+    formDataValidation(formVar, "developer", game.developer);
+    formDataValidation(formVar, "platform", game.platform);
+    formDataValidation(formVar, "gameUrl", game.gameUrl);
+    formDataValidation(formVar, "startDate", game.startDate);
+    formDataValidation(formVar, "startTime", game.startTime);
+    formDataValidation(formVar, "finishDate", game.finishDate);
+    formDataValidation(formVar, "finishTime", game.finishTime);
+    formDataValidation(formVar, "score", game.score);
+
+    return formVar;
+}
+
 // Add game to database
-function addGameToDatabase(game) {
-    const formData = new FormData();
-    formDataValidation(formData, "imageUrl", game.imageUrl);
-    formDataValidation(formData, "gameTitle", game.gameTitle);
-    formDataValidation(formData, "developer", game.developer);
-    formDataValidation(formData, "platform", game.platform);
-    formDataValidation(formData, "gameUrl", game.gameUrl);
-    formDataValidation(formData, "startDate", game.startDate);
-    formDataValidation(formData, "startTime", game.startTime);
-    formDataValidation(formData, "finishDate", game.finishDate);
-    formDataValidation(formData, "finishTime", game.finishTime);
-    formDataValidation(formData, "score", game.score);
+function addUpdateGame(game, isUpdate) {
+    const formData = buildFormData(game, isUpdate);
+    let url = `${API_URL}/game`;
 
-    console.log(formData)
-
-    let url = 'http://127.0.0.1:5000/game';
-
-    fetch(url, {method: 'post',
-               body: formData
+    fetch(url, {method: isUpdate ? 'put' : 'post',
+                body: formData
     })
         .then(response => response.json())
         .then(_ => {
             clearGameTable();
             getGameList();  
             closeModal();
-            
         })
         .catch((error) => console.error(error));
-}
-
-// Update game in database
-function updateGame(game) {
-
 }
 
 function removeRow(event, gameId, gameTitle) {
@@ -118,9 +132,7 @@ function removeRow(event, gameId, gameTitle) {
 }
 
 function deleteGame(gameId, gameTitle) {
-    // console.log(`Game ${gameTitle}(#${gameId}) will (maybe) be deleted!`)
-
-    let url = `http://127.0.0.1:5000/game?id=${gameId}&gameTitle=${encodeURIComponent(gameTitle)}`
+    let url = `${API_URL}/game?id=${gameId}&gameTitle=${encodeURIComponent(gameTitle)}`
     fetch(url, {
         method: "delete"
     })
@@ -287,7 +299,8 @@ const modalHeader = $element("add-edit-header")
 const gamePlatformList = ["PC", "Playstation 1", "Playstation 2", "Playstation 3", "Playstation 4", "Playstation 5", "Playstation 6", "Xbox", "Xbox360", "Xbox One", "Xbox Series X/S", "NES", "SNES", "Nintendo 64", "GameCube", "Wii", "Wii U", "Game&Watch", "Gameboy", "Gameboy Color", "Gameboy Advance", "Nintendo DS", "Nintendo DSi", "Nintendo 3DS", "New Nintendo 3DS", "Virtual Boy", "Nintendo Switch", "Nintendo Switch 2", "Zeebo", "Atari 2600", "Atari 5200", "Atari 7800", "Atari XEGS", "Atari Lynx", "Atari Lynx II", "Atari Jaguar", "Atari VCS", "CD-i"]
 const gameScoreValues = [0.0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.0];
 let hasScore = scoreToggleCheck.checked;
-let update = false;
+let updating = false;
+let updateId = 0;
 
 const formInputs = {
     gameImageUrl: $element("game-form-image_url"),
@@ -304,6 +317,9 @@ const formInputs = {
 
 function closeModal() {
     // Reset content
+    hasScore = false;
+    updating = false;
+    updateId = 0;
     gameForm.reset();
     imageExample.src = 'assets/game_image_placeholder.png';
     formInputs.score.disabled = true;
@@ -313,19 +329,19 @@ function closeModal() {
     modal.classList.add("hidden");
 }
 
-function openModal(gameId=undefined) {
+async function openModal(gameId=undefined) {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
-    update = gameId != null;
+    updating = gameId != null;
 
-    console.log(update ? "UPDATE" : "CREATE")
+    // console.log(updating ? "UPDATE" : "CREATE")
 
     loadPlatforms();  
 
-    if (update) {
+    if (updating) {
         modalHeader.innerHTML = "Edit Game";
-        // Get game from db with id ........
-        loadGameIntoForm(testGame);
+        updateId = gameId;
+        getGameById(gameId)
     } else {    
         modalHeader.innerHTML = "Add Game";
     }
@@ -339,26 +355,17 @@ function scoreCheck(game) {
     }
 }
 
-function dateCheck(date) {
-    return date ? date.toISOString().split('T')[0] : undefined;
-}
-
-function timeCheck(time) {
-    const regex = /^([01]\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$/;
-    return regex.test(time) ? time : undefined;
-}
-
-function loadGameIntoForm(game) {
+function loadEditGameForm(game) {
     formInputs.gameImageUrl.value = game.imageUrl || "";
     toggleImageTest(); // Update example image (if needed)
     formInputs.gameTitle.value = game.gameTitle || "";
     formInputs.dev.value = game.developer || "";
     formInputs.platform.value = game.platform || "";
     formInputs.link.value = game.gameUrl || "";
-    formInputs.startDate.value = dateCheck(game.startDate);
-    formInputs.startTime.value = timeCheck(game.startTime);
-    formInputs.finishDate.value = dateCheck(game.finishDate);
-    formInputs.finishTime.value = timeCheck(game.finishTime);
+    formInputs.startDate.value = game.startDate || "";
+    formInputs.startTime.value = game.startTime || "";
+    formInputs.finishDate.value = game.finishDate || "";
+    formInputs.finishTime.value = game.finishTime || "";
     scoreCheck(game); // Score value validation
     formInputs.score.value = gameScoreValues.indexOf(game.score) || 0;
     currentScore.textContent = game.score || 0;
@@ -367,6 +374,7 @@ function loadGameIntoForm(game) {
 }
 
 function loadPlatforms() {
+    platformSelect.innerHTML = ""; 
 
     let defaultOption = document.createElement("option");
     defaultOption.value = "";
@@ -380,7 +388,8 @@ function loadPlatforms() {
         platformSelect.appendChild(platformOption);
     })
     
-    defaultOption.textContent = "";
+    defaultOption.textContent = "Select...";
+    defaultOption.selected = true;
     platformSelect.disabled = false;
 }
 
@@ -404,21 +413,27 @@ gameForm.addEventListener("submit", function(event) {
     }
 
     // Date/Time Validation
-    const startDateValue = new Date(formInputs.startDate.value);
-    const startTimeValue = new Date(formInputs.startTime.value);
-    const finishDateValue = new Date(formInputs.finishDate.value);
-    const finishTimeValue = new Date(formInputs.finishTime.value);
+    const startDateValue = formInputs.startDate.value;
+    const startTimeValue = formInputs.startTime.value;
+    const finishDateValue = formInputs.finishDate.value;
+    const finishTimeValue = formInputs.finishTime.value;
 
-    if (finishDateValue < startDateValue) {
-        alert("The 'Finished At' date must be after the 'Started At' date.")
-    } else if (startDateValue.getTime() == finishDateValue.getTime()) {
-        console.log("equal")
-        console.log(startTimeValue)
-        console.log(finishTimeValue)
+    if (startDateValue && finishDateValue) {
+        if (finishDateValue < startDateValue) {
+            alert("The 'Finished At' date must be after the 'Started At' date.")
+            return;
+        } 
+
+        if (startDateValue === finishDateValue) {
+            if (finishTimeValue < startTimeValue) {
+                alert("The 'Finished At' time must be after the 'Started At' time.")
+                return;
+            }
+        }
     }
 
-    let newGame = new Game(
-        undefined,
+    let game = new Game(
+        updating ? updateId : undefined,
         formInputs.gameImageUrl.value,
         formInputs.gameTitle.value,
         formInputs.dev.value,
@@ -431,8 +446,7 @@ gameForm.addEventListener("submit", function(event) {
         hasScore ? gameScoreValues[formInputs.score.value] : null
     );
 
-    console.log("GAME ADDED YAY!")
-    // addGameToDatabase(newGame);
+    addUpdateGame(game, updating);
 })
 
 formInputs.score.addEventListener("input", () => {
@@ -445,20 +459,20 @@ scoreToggleCheck.addEventListener("change", (event) => {
 
 });
 
-// getGameList();  // Retrieve games 
+getGameList();  // Retrieve games 
 
-const testGame = new Game(
-    1, 
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZbB_doR9LVg_xVbDXOOZc3TNbgNCEIzLLKw&s",
-    "Orange: The game",
-    "Adam Sandler",
-    "Zeebo",
-    "https://www.google.com",
-    undefined,
-    "22:30",
-    undefined,
-    undefined,
-    2.0
-)
+// const testGame = new Game(
+//     1, 
+//     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZbB_doR9LVg_xVbDXOOZc3TNbgNCEIzLLKw&s",
+//     "Orange: The game",
+//     "Adam Sandler",
+//     "Zeebo",
+//     "https://www.google.com",
+//     undefined,
+//     "22:30",
+//     undefined,
+//     undefined,
+//     2.0
+// )
 
-addGameToTable(testGame);
+// addGameToTable(testGame);
