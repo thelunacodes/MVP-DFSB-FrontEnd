@@ -126,12 +126,22 @@ function addUpdateGame(game, isUpdate) {
 }
 
 // Deletes a game from the database
-function deleteGame(gameId, gameTitle) {
+function deleteGame(event, gameId, gameTitle) {
     let url = `${API_URL}/game?id=${gameId}&gameTitle=${encodeURIComponent(gameTitle)}`
     fetch(url, {
         method: "delete"
     })
-        .then(response => response.json())
+        .then(response => {
+            if (response.ok) {
+                const gameRow = event.target.closest("tr");
+                gameRow.remove();
+                // console.log("DELETOU UAU");
+                gameTable.innerHTML = "";  
+                getGameList();  
+                closeModal();
+            }
+            
+        })
         .catch(error => console.error(error));
 }
 
@@ -319,17 +329,13 @@ function openModal() {
 function closeModal() {
     hideAllModals();
 
-    // Reset modal content
-    if (!modalList.ADD_EDIT.classList.contains("hidden")) {
-        resetAddEditModal();
-    }
-
     modalBase.classList.remove("flex");
     modalBase.classList.add("hidden");
 }
 
 // Hides all modal content
 function hideAllModals() {
+    resetAddEditModal();
     Object.values(modalList).forEach(modal => {
         modal.classList.add("hidden");
         modal.classList.remove("flex");
@@ -396,7 +402,7 @@ function showAddEditModal(gameId=undefined) {
     if (updating) {
         modalHeader.innerHTML = "Edit Game";
         updateId = gameId;
-        // getGameById(gameId)
+        getGameById(gameId)
     } else {    
         modalHeader.innerHTML = "Add Game";
     }
@@ -421,13 +427,7 @@ function showConfirmRemoveModal(event, gameId, gameTitle) {
 
     const confirmBtn = $element("remove-confirm-btn")
     confirmBtn.onclick = () => { 
-        // deleteGame(gameId, gameTitle)
-        // const gameRow = event.target.closest("tr");
-        // gameRow.remove();
-        console.log("DELETOU UAU");
-        // gameTable.innerHTML = "";  
-        // getGameList();  
-        closeModal();
+        deleteGame(event, gameId, gameTitle)   
     }
 }
 
@@ -609,9 +609,7 @@ gameForm.addEventListener("submit", function(event) {
         hasScore ? gameScoreValues[formInputs.score.value] : null
     );
 
-    console.log("JOGO SALVO")
-    console.log(game)
-    // addUpdateGame(game, updating);
+    addUpdateGame(game, updating);
 })
 
 // Updates label underneath the score scroll with the current score value
@@ -626,20 +624,20 @@ scoreToggleCheck.addEventListener("change", (event) => {
 
 });
 
-// getGameList();  // Retrieve games 
+getGameList();  // Retrieve games 
 
-const testGame = new Game(
-    1, 
-    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZbB_doR9LVg_xVbDXOOZc3TNbgNCEIzLLKw&s",
-    "Orange: The game",
-    "Adam Sandler",
-    "Zeebo",
-    "https://www.google.com",
-    undefined,
-    "22:30",
-    undefined,
-    undefined,
-    2.0
-)
+// const testGame = new Game(
+//     1, 
+//     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZbB_doR9LVg_xVbDXOOZc3TNbgNCEIzLLKw&s",
+//     "Orange: The game",
+//     "Adam Sandler",
+//     "Zeebo",
+//     "https://www.google.com",
+//     undefined,
+//     "22:30",
+//     undefined,
+//     undefined,
+//     2.0
+// )
 
-addGameToTable(testGame);
+// addGameToTable(testGame);
