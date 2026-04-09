@@ -83,38 +83,41 @@ async function getGameList() {
 }
 
 // Validates data from the add/edit form, before putting it into a FormData
-function formDataValidation(formData, key, value) {
-    if (value !== undefined && value !== null && value !== "" ) {
-        formData.append(key, value);
-    }
-}
+// function formDataValidation(formData, key, value) {
+//     if (value !== undefined && value !== null && value !== "" ) {
+//         formData.append(key, value);
+//     }
+// }
 
 // Builds the FormData for adding/updating a game
-function buildFormData(game, update=false) {
-    const formVar = new FormData();
-    
-    if (update) { formDataValidation(formVar, "id", game.id)};
-    formDataValidation(formVar, "imageUrl", game.imageUrl);
-    formDataValidation(formVar, "gameTitle", game.gameTitle);
-    formDataValidation(formVar, "developer", game.developer);
-    formDataValidation(formVar, "platform", game.platform);
-    formDataValidation(formVar, "gameUrl", game.gameUrl);
-    formDataValidation(formVar, "startDate", game.startDate);
-    formDataValidation(formVar, "startTime", game.startTime);
-    formDataValidation(formVar, "finishDate", game.finishDate);
-    formDataValidation(formVar, "finishTime", game.finishTime);
-    formDataValidation(formVar, "score", game.score);
+function buildJson(game, update = false) {
+    const json = {};
 
-    return formVar;
+    if (update && game.id) json.id = game.id;
+    if (game.imageUrl) json.imageUrl = game.imageUrl;
+    if (game.gameTitle) json.gameTitle = game.gameTitle;
+    if (game.developer) json.developer = game.developer;
+    if (game.platform) json.platform = game.platform;
+    if (game.gameUrl) json.gameUrl = game.gameUrl;
+    if (game.startDate) json.startDate = game.startDate;
+    if (game.startTime) json.startTime = game.startTime;
+    if (game.finishDate) json.finishDate = game.finishDate;
+    if (game.finishTime) json.finishTime = game.finishTime;
+    if (game.score !== undefined && game.score !== null) json.score = game.score;
+
+    return json;
 }
 
 // Adds/updates a game 
 function addUpdateGame(game, isUpdate) {
-    const formData = buildFormData(game, isUpdate);
+    const jsonData = buildJson(game, isUpdate);
     let url = `${API_URL}/game`;
 
     fetch(url, {method: isUpdate ? "put" : "post",
-                body: formData
+                    headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(jsonData)
     })
         .then(response => response.json())
         .then(_ => {
