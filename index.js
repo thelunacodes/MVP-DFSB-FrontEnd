@@ -130,7 +130,7 @@ function addUpdateGame(game, isUpdate) {
 
 // Deletes a game from the database
 function deleteGame(event, gameId, gameTitle) {
-    let url = `${API_URL}/game?id=${gameId}&gameTitle=${encodeURIComponent(gameTitle)}`
+    let url = `${API_URL}/game?id=${gameId}}`
     fetch(url, {
         method: "delete"
     })
